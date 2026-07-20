@@ -175,7 +175,7 @@ Lead with the verified outcome:
 
 Show:
 
-- A direct result row for `2026 여름축제 행사계획서.hwp` with `Finder에서 보기`.
+- A direct result row for `2026 여름축제 행사계획서.hwp`.
 - Destination `학생회 문서/행사계획서` and one concise verified status line.
 - Primary action `문서 열기` and secondary action `Finder에서 보기`.
 - One collapsed `작업 세부 정보` disclosure. Only when expanded may it show the four-stage history, verified sections, and privacy disclosure.
@@ -213,7 +213,7 @@ Apply this as a visual and density correction to all six existing screens in `Do
 
 The current screens are too opaque and too dense. Regenerate each screen with unmistakable optical glass and one-decision-at-a-time composition:
 
-1. Keep the real stage-appropriate application visibly recognizable behind every overlay: Discord during request and requirements stages, then the Doon-controlled Chrome window with Hancom Docs during drafting and review. Use a semi-transparent white-to-soft-amber membrane, 24-28px background blur, increased saturation, a bright top/left refractive rim, a darker bottom/right edge, a clipped upper specular sheen, and both short contact and diffuse ambient shadows. Do not use an opaque white or gray panel. Do not place a flat solid rectangle behind the whole overlay.
+1. Keep the real stage-appropriate context visibly recognizable behind every overlay: Discord for command, planning, and `requirements_collected`; a Doon result surface for `content_drafted`; then the Doon-controlled Chrome window with Hancom Docs for `document_formatted`, `file_saved`, and their reviews. Use a semi-transparent white-to-soft-amber membrane, 24-28px background blur, increased saturation, a bright top/left refractive rim, a darker bottom/right edge, a clipped upper specular sheen, and both short contact and diffuse ambient shadows. Do not use an opaque white or gray panel. Do not place a flat solid rectangle behind the whole overlay.
 2. Use generous negative space. Each screen shows one primary message, one supporting line, and one primary decision. Limit the default view to three information groups and two visible text actions.
 3. Command screen: show Doon header, command input, one compact context line, and `작업 계획 만들기`. Hide examples and scope copy behind `범위 보기`.
 4. Plan screen: show outcome, four compact stages, and `작업 시작` plus `범위 수정`. Collapse permissions and completion conditions into one disclosure.

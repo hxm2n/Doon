@@ -660,7 +660,7 @@ This surface is intentionally lower priority than the desktop product but must n
 - **Privacy:** default interface must not expose secrets, full raw screen captures, or sensitive content in history previews.
 - **History retention:** completed, failed, and cancelled task history expires after 30 days; diagnostic action logs expire after 7 days. Deleting a task must cascade through its stages, approvals, revisions, and action logs without deleting the user's generated document.
 - **Renderer isolation:** Electron renderer windows must use context isolation, sandboxing, disabled Node integration, a restrictive CSP, and a narrow typed preload API. Privileged APIs and arbitrary IPC channels are never exposed to the renderer.
-- **Execution policy:** each GUI action must remain bound to the approved app, registered window, account confirmation, web origin, output-folder bookmark, and action budget defined for the current stage.
+- **Execution policy:** each GUI action must remain bound to the approved app, registered window, account confirmation, web origin, opaque output-folder capability, and action budget defined for the current stage.
 - **Compatibility:** macOS is the first supported environment; dark and light system appearance are both required.
 - **Localization:** Korean is first-class; layout and controls must remain valid in English.
 - **Testing:** every stateful component requires keyboard, focus, reduced-motion, light/dark, error, and long-Korean-text checks.
