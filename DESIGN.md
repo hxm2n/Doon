@@ -8,6 +8,7 @@
 - **Secondary product surface:** desktop app installation website (planned after the core desktop experience)
 - **Evidence reviewed:**
   - [`PRD-Doon.md`](./PRD-Doon.md)
+  - User direction: Codex-like translucent desktop material with a soft, low-saturation yellow identity
   - [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
   - [Raycast DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/raycast/DESIGN.md)
   - [Apple DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/apple/DESIGN.md)
@@ -171,6 +172,18 @@ For every active task, use this hierarchy:
 
 Do not lead with model reasoning, raw screenshots, coordinates, or click history.
 
+### Focus and density contract
+
+Every Doon surface must answer one question at a time. A surface may contain rich information in its expanded state, but its default state is intentionally sparse.
+
+- Show one primary message, one supporting line, and one primary decision per transient surface.
+- Keep no more than three visible information groups in a palette, HUD, checkpoint, pause dialog, or completion summary.
+- Show at most two visible text actions. Move tertiary actions into an overflow menu unless they are safety-critical; `Stop` may remain as an icon control with a tooltip.
+- Do not show scope, evidence, completion criteria, history, privacy, and next actions simultaneously. Lead with the item needed for the current decision and reveal the rest on demand.
+- Use a single compact disclosure row such as `세부 정보 보기` for supporting scope, evidence, or history.
+- A main window may hold more information, but its first viewport still needs one dominant result and one next action. Secondary sections begin below the fold or stay collapsed.
+- If removing a block does not change the user's immediate decision, remove it from the default state.
+
 ## Design principles
 
 ### 1. Outcome over spectacle
@@ -212,7 +225,11 @@ Partial success, changed interfaces, missing permissions, and interrupted work a
 
 ### Theme and atmosphere
 
-The default visual character is a quiet system utility with crisp information hierarchy, neutral surfaces, restrained color, and limited elevation. Doon supports system light and dark appearance from the same semantic token model.
+The visual direction is **Soft Amber Glass**: a quiet macOS utility built from cool neutral canvases, optically layered translucent material, precise edge refraction, and a soft butter-yellow action color. It should recall the calm dimensional material of Codex without copying its product chrome, layout, or branding.
+
+Glass is functional rather than decorative. Use it where seeing the active application behind Doon helps the user understand context: the Command Palette, Execution HUD, Checkpoint Review, transient dialogs, and compact navigation chrome. Main reading surfaces, long activity histories, settings forms, and document previews remain more opaque for legibility.
+
+Doon supports system light and dark appearance from the same semantic token model. Transparency must adapt to the wallpaper and underlying application without allowing either to reduce text contrast.
 
 The desktop app should be visually quieter than the installation website. The website can use more space and product media, but it must still show the real Doon interface rather than abstract AI imagery.
 
@@ -222,28 +239,70 @@ Use semantic names in code. Hex values are provisional until visual implementati
 
 | Token | Light | Dark | Role |
 | :--- | :--- | :--- | :--- |
-| `canvas` | `#F5F6F7` | `#17191C` | Main window background |
-| `surface` | `#FFFFFF` | `#202329` | Panels and controls |
-| `surface-elevated` | `#EEF1F3` | `#292D34` | Selected and elevated regions |
-| `border` | `#D8DDE2` | `#3A4048` | Standard boundaries |
-| `border-strong` | `#B9C0C8` | `#59616C` | Focused or important boundaries |
-| `text-primary` | `#17191C` | `#F5F7FA` | Primary text |
-| `text-secondary` | `#5E656E` | `#B5BBC4` | Supporting text |
-| `text-tertiary` | `#858D97` | `#89919C` | Metadata and disabled text |
-| `action` | `#0B6F69` | `#62D0C4` | Primary action and focus |
-| `on-action` | `#FFFFFF` | `#102522` | Text on primary action |
+| `canvas` | `#EEF0F3` | `#151619` | Main window background |
+| `canvas-highlight` | `#F7F3E4` | `#2B281C` | Localized ambient warmth behind glass, never a full-page fill |
+| `surface` | `#FAFBFC` | `#202226` | Opaque reading and form surfaces |
+| `surface-elevated` | `#F3F4F6` | `#292C31` | Selected and elevated opaque regions |
+| `glass` | `rgba(255, 255, 255, 0.52)` | `rgba(35, 37, 42, 0.58)` | Standard contextual glass color membrane |
+| `glass-strong` | `rgba(255, 255, 255, 0.66)` | `rgba(31, 33, 38, 0.72)` | Readable glass without hiding the active application |
+| `glass-subtle` | `rgba(255, 255, 255, 0.34)` | `rgba(45, 47, 53, 0.42)` | Compact HUD and transient chrome |
+| `glass-warm` | `rgba(232, 207, 114, 0.16)` | `rgba(240, 217, 125, 0.12)` | Local amber refraction inside glass, never a flat fill |
+| `border` | `rgba(69, 74, 82, 0.18)` | `rgba(255, 255, 255, 0.14)` | Standard boundaries |
+| `border-highlight` | `rgba(255, 255, 255, 0.86)` | `rgba(255, 255, 255, 0.24)` | Top-lit glass edge and inner refraction |
+| `border-shade` | `rgba(31, 34, 40, 0.20)` | `rgba(0, 0, 0, 0.42)` | Lower glass edge that gives the pane thickness |
+| `border-strong` | `rgba(55, 59, 66, 0.34)` | `rgba(255, 255, 255, 0.30)` | Focused or important boundaries |
+| `text-primary` | `#191A1D` | `#F7F7F5` | Primary text |
+| `text-secondary` | `#5F636B` | `#B9BBC1` | Supporting text |
+| `text-tertiary` | `#858991` | `#8F929A` | Metadata and disabled text |
+| `action` | `#E8CF72` | `#F0D97D` | Primary button fill and Doon identity |
+| `action-hover` | `#DEC25A` | `#F4E092` | Hovered primary action |
+| `action-pressed` | `#CDAA3E` | `#D8BB59` | Pressed primary action |
+| `action-ink` | `#69540F` | `#F4DF8D` | Action text, selected labels, and inline emphasis |
+| `on-action` | `#29230E` | `#29230E` | Text and icons on yellow action surfaces |
 | `info` | `#2563A8` | `#70A7E8` | Informational state |
 | `success` | `#1F7A46` | `#65C98C` | Completed and verified state |
 | `warning` | `#A95F00` | `#E2A34B` | Caution and blocked state |
 | `danger` | `#B9342C` | `#F07A72` | Destructive action and failure |
-| `focus-ring` | `#147D78` | `#79D8CE` | Keyboard focus indicator |
+| `focus-ring` | `#826814` | `#F4DF8D` | Keyboard focus indicator |
 
 Rules:
 
 - Do not use status colors as large decorative backgrounds.
 - Do not communicate state through color alone; pair color with icon and text.
-- Reserve `action` for primary interaction, active focus, and Doon identity.
-- Use neutral surfaces for most of the interface so active content remains dominant.
+- Reserve `action` for primary buttons, small active indicators, and restrained Doon identity moments.
+- Use `action-ink`, not yellow fill, for links or text placed directly on light surfaces.
+- Do not use pale yellow text on white or translucent light glass.
+- Use neutral surfaces for most of the interface so the active application remains dominant.
+- Keep `canvas-highlight` localized and soft. The product must not become a cream or yellow monochrome interface.
+
+### Glass material recipe
+
+Glass must read as layered material, not a transparent rectangle with blur applied.
+
+- Build every pane from five visible layers: contextual content behind it, a translucent color membrane, background blur and saturation, a bright top/left rim, and a darker lower edge. A pane missing any of these reads as frosted plastic or a flat white card.
+- Standard glass: a diagonal membrane blending `glass` into `glass-warm`, `24px` backdrop blur, `155%` saturation, and `105%` contrast. Underlying app colors and large shapes must remain faintly recognizable through it.
+- Strong glass: the same optical stack using `glass-strong`, `28px` backdrop blur, and a localized opaque reading patch only directly behind long text. Do not raise the opacity of the whole panel.
+- Compact glass: `glass-subtle`, `18px` backdrop blur, and a clearer rim so the small HUD still reads as a physical pane.
+- Refraction rim: the top and left edges use `border-highlight`; the bottom and right edges use `border-shade`. Keep both within a single 1px boundary instead of drawing a generic gray outline.
+- Specular sheen: add one clipped, non-interactive highlight across the upper 20-30% of the pane, fading from soft white to transparent. It must follow the pane radius and never sit behind body text.
+- Light-mode depth: combine a bright inner top line, a faint inner lower shade, a short contact shadow, and a larger diffuse ambient shadow. The pane should appear 4-8px above the active application.
+- Dark-mode depth: retain the rim and lower edge but reduce the white haze; text sits on a slightly darker localized reading patch instead of an opaque dark card.
+- The background behind glass must include real application content or restrained tonal variation. Never demonstrate glass against a uniform gray or white rectangle because no refraction will be visible.
+- Every glass surface needs an opaque fallback using `surface` or `surface-elevated` when transparency is reduced, unsupported, or fails contrast.
+- Never stack glass panels inside other glass panels. Inner groups use dividers, opaque rows, or tonal surface changes.
+- Do not blur document previews, screenshots, or the content Doon is operating on.
+
+Surface mapping:
+
+| Surface | Material | Reason |
+| :--- | :--- | :--- |
+| Command Palette | `glass-strong` | Keeps the active application visible while protecting command readability |
+| Execution HUD | `glass-subtle` | Remains lightweight and contextual at the screen edge |
+| Checkpoint Review | `glass-strong` shell with opaque `surface` preview | Separates user judgment from the changing application behind it |
+| Pause and risk dialogs | `glass-strong` | Makes control handoff prominent without introducing a new visual language |
+| Main Window sidebar | Standard `glass` over the window canvas | Creates soft navigation depth without turning content into floating cards |
+| Main Window content | Opaque `surface` and unframed regions | Supports long reading, history, and settings with stable contrast |
+| Installation website navigation | Standard `glass` only while overlaying product media | Preserves the same material identity without glassifying every content band |
 
 ### Typography
 
@@ -281,8 +340,11 @@ Website display type steps down to 40px on narrow screens. Do not scale font siz
 - Buttons and inputs: `6px`
 - Panels, result previews, and repeated item cards: `8px` maximum
 - Status chips may use a full radius only when the pill shape communicates compact metadata.
-- Use `1px` borders before adding shadows.
-- Overlay elevation: `0 10px 32px rgba(0, 0, 0, 0.16)` in light mode and `0 12px 36px rgba(0, 0, 0, 0.36)` in dark mode.
+- Use a boundary edge and inner highlight before adding an external shadow.
+- Standard glass elevation: `0 1px 0 rgba(255, 255, 255, 0.74) inset`, `0 -1px 0 rgba(31, 34, 40, 0.10) inset`, `0 4px 10px rgba(27, 29, 33, 0.10)`, `0 20px 50px rgba(27, 29, 33, 0.14)` in light mode.
+- Strong overlay elevation: `0 1px 0 rgba(255, 255, 255, 0.82) inset`, `0 -1px 0 rgba(31, 34, 40, 0.14) inset`, `0 6px 14px rgba(18, 19, 22, 0.12)`, `0 28px 64px rgba(18, 19, 22, 0.22)` in light mode.
+- Dark glass elevation: `0 1px 0 rgba(255, 255, 255, 0.09) inset`, `0 18px 48px rgba(0, 0, 0, 0.42)`.
+- Primary yellow buttons use a quiet inner highlight and a short warm shadow no darker than `rgba(91, 70, 8, 0.18)`; they must not glow.
 - Do not place cards inside cards. Use dividers, grouped rows, or unframed content regions inside a panel.
 
 ### Motion
@@ -426,6 +488,7 @@ Do not use a generic `OK` button. Risk confirmation copy must name the actual ef
 - Result previews must expose semantic headings, lists, and change descriptions.
 - Respect system text size where the desktop framework permits it.
 - Respect Reduce Motion and increased-contrast settings.
+- Respect Reduce Transparency by replacing every glass token with its opaque fallback and removing backdrop blur without changing layout.
 - Avoid relying on hover for essential explanation or actions.
 - Website touch targets must be at least `44px`; compact desktop controls should be at least `32px` unless a native macOS control defines otherwise.
 - Korean and English text must fit without truncating primary actions or status messages.
@@ -564,6 +627,10 @@ This surface is intentionally lower priority than the desktop product but must n
 - Keep recovery and interruption visible.
 - Show access scope and stored memory in plain language.
 - Use restrained semantic color and system-native behavior.
+- Use glass only when underlying context helps the user understand scope, progress, or control handoff.
+- Make the active application visibly refract through glass; a nearly opaque white panel does not satisfy the material direction.
+- Keep the soft yellow identity sparse enough that it still identifies the next primary action.
+- Keep each default task surface focused on one result or decision and disclose supporting detail only when requested.
 - Validate desktop overlays on small displays and multiple monitors.
 
 ### Do not
@@ -573,6 +640,9 @@ This surface is intentionally lower priority than the desktop product but must n
 - Let an overlay cover the object Doon is operating on.
 - Resume control silently after user input.
 - Use color alone for status or risk.
+- Apply transparency to long reading surfaces, document previews, or nested containers.
+- Put more than three information groups or more than two visible text actions in a transient task surface.
+- Use yellow as a page background, large decorative wash, or low-contrast body text.
 - Hide partial completion when a later stage fails.
 - Copy Raycast, Apple, Linear, or Zapier tokens and visual signatures directly.
 - Build the installation homepage before the desktop product has a truthful visual to show.
@@ -594,7 +664,7 @@ This surface is intentionally lower priority than the desktop product but must n
 
 - [ ] Choose native macOS versus cross-platform desktop framework / Engineering / determines component and window behavior
 - [ ] Select the Doon logo and final brand mark / Product and Design / affects iconography and installation website
-- [ ] Validate provisional color tokens in real light and dark desktop prototypes / Design / affects contrast and brand recognition
+- [ ] Validate Soft Amber Glass tokens against varied wallpapers and applications in light, dark, increased-contrast, and reduced-transparency modes / Design / affects contrast and brand recognition
 - [ ] Choose global pause and emergency-stop shortcuts / Product and Engineering / affects safety and accessibility
 - [ ] Define exact conditions that create a stage checkpoint / Product / affects approval fatigue and safety
 - [ ] Decide how much action evidence is retained locally and for how long / Product and Security / affects trust and recovery
