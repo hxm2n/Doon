@@ -192,7 +192,7 @@ Show what changed, what remains, and whether the requested outcome is satisfied.
 
 ### 2. Meaningful checkpoints, not permission fatigue
 
-Ask for input when the user can judge a stage result or when an action creates meaningful risk. Do not ask for approval for every click, text entry, or window change.
+Every outcome-level stage ends with a review because the user can judge its result. Do not ask for approval for individual clicks, text entry, or window changes inside that stage. Additional confirmation is reserved for a newly discovered risk boundary.
 
 ### 3. Never steal control
 
@@ -458,9 +458,12 @@ Actions:
 
 - Primary: `Approve and continue`
 - Secondary: `Revise`
-- Tertiary: `Stop`
+- Overflow: `Run again`
+- Safety control: `Stop`
 
 Do not use a generic `OK` button. Risk confirmation copy must name the actual effect.
+
+The canonical stage IDs are `requirements_collected`, `content_drafted`, `document_formatted`, and `file_saved`, in that order. Every stage result enters `awaiting_review`; the next stage cannot begin until approval. Revision and rerun create a new result for the same stage. Approving `file_saved` moves the task to `completed`. These IDs and transitions are shared with `TECH-STACK.md` and the Stitch brief.
 
 ### Control handoff
 
@@ -649,12 +652,15 @@ This surface is intentionally lower priority than the desktop product but must n
 
 ## Implementation constraints
 
-- **Desktop framework:** Electron + React + TypeScript + Vite is selected for the MVP, with a minimal Swift helper for native macOS control. Follow [`TECH-STACK.md`](./TECH-STACK.md); the implementation must support accessibility APIs, global shortcuts, menu bar presence, system permissions, multi-window behavior, notifications, and signed distribution.
+- **Desktop framework:** Electron + React + TypeScript + Vite is selected for the MVP, with a minimal Swift helper for native macOS control. Follow [`TECH-STACK.md`](./TECH-STACK.md); the implementation must support accessibility APIs, global shortcuts, menu bar presence, system permissions, multi-window behavior, notifications, and a later signing path. The three-day MVP artifact itself is unsigned and unnotarized.
 - **Website framework:** not selected; defer implementation until the desktop product has a stable download artifact and real product media.
 - **Design tokens:** implement the semantic token names from this document before adding component-specific colors.
 - **Performance:** command palette should appear immediately after the global shortcut; expensive context gathering begins after the surface is visible.
 - **Overlay safety:** overlays must avoid focus theft, controlled content occlusion, and pointer conflicts.
 - **Privacy:** default interface must not expose secrets, full raw screen captures, or sensitive content in history previews.
+- **History retention:** completed, failed, and cancelled task history expires after 30 days; diagnostic action logs expire after 7 days. Deleting a task must cascade through its stages, approvals, revisions, and action logs without deleting the user's generated document.
+- **Renderer isolation:** Electron renderer windows must use context isolation, sandboxing, disabled Node integration, a restrictive CSP, and a narrow typed preload API. Privileged APIs and arbitrary IPC channels are never exposed to the renderer.
+- **Execution policy:** each GUI action must remain bound to the approved app, registered window, account confirmation, web origin, output-folder bookmark, and action budget defined for the current stage.
 - **Compatibility:** macOS is the first supported environment; dark and light system appearance are both required.
 - **Localization:** Korean is first-class; layout and controls must remain valid in English.
 - **Testing:** every stateful component requires keyboard, focus, reduced-motion, light/dark, error, and long-Korean-text checks.
@@ -666,8 +672,6 @@ This surface is intentionally lower priority than the desktop product but must n
 - [ ] Select the Doon logo and final brand mark / Product and Design / affects iconography and installation website
 - [ ] Validate Soft Amber Glass tokens against varied wallpapers and applications in light, dark, increased-contrast, and reduced-transparency modes / Design / affects contrast and brand recognition
 - [ ] Choose global pause and emergency-stop shortcuts / Product and Engineering / affects safety and accessibility
-- [ ] Define exact conditions that create a stage checkpoint / Product / affects approval fatigue and safety
-- [ ] Decide how much action evidence is retained locally and for how long / Product and Security / affects trust and recovery
 - [ ] Decide local-versus-remote processing disclosures / Engineering and Security / affects onboarding and website copy
 - [ ] Define signed installer, update mechanism, system requirements, and release metadata / Engineering / blocks installation website completion
 - [ ] Produce a truthful desktop product recording before designing the website hero / Product and Design / blocks final website visual direction

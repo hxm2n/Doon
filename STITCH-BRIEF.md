@@ -38,7 +38,7 @@ Design light appearance first at a 1440 x 900 desktop context. Use Korean as the
 Required visual behavior:
 
 - Native macOS visual grammar using the `Soft Amber Glass` material and restrained butter-yellow action color from `DESIGN.md`.
-- Make the material unmistakably glass: the active application for the current stage must remain faintly visible through each overlay. Use Discord for command, planning, and requirements collection; use the Doon-controlled Chrome window with Hancom Docs for document drafting, checkpoint, and document-stage pause states. Colors must refract softly, and every pane needs a bright top/left rim, darker lower edge, clipped upper sheen, and diffuse ambient shadow. A translucent white rectangle with blur is not sufficient.
+- Make the material unmistakably glass: the active context for the current stage must remain faintly visible through each overlay. Use Discord for command, planning, and requirements collection; use a Doon result surface for the content-draft review; use the Doon-controlled Chrome window with Hancom Docs for formatting, file-save review, and document-stage pause states. Colors must refract softly, and every pane needs a bright top/left rim, darker lower edge, clipped upper sheen, and diffuse ambient shadow. A translucent white rectangle with blur is not sufficient.
 - Use a semi-transparent diagonal white-to-warm membrane rather than an opaque white panel. Preserve readable text with small localized reading patches, not by making the entire pane solid.
 - Maximum corner radius of 8px for panels and 6px for controls.
 - Use borders before shadows and never nest cards inside cards.
@@ -84,10 +84,12 @@ Lead with only the intended outcome:
 
 Show four outcome-level stages as one quiet vertical sequence with minimal icons:
 
-1. `학생회 Discord에서 요구사항 확인`
-2. `행사계획서 구조와 내용 작성`
-3. `한글 문서 형식 적용`
-4. `학생회 문서 폴더에 저장`
+1. `요구사항 수집 및 정리`
+2. `문서 구조와 내용 초안 작성`
+3. `한컴독스 문서 형식 적용`
+4. `HWP 파일 저장 및 확인`
+
+These labels map 1:1, in order, to `requirements_collected`, `content_drafted`, `document_formatted`, and `file_saved` in `TECH-STACK.md`. Do not rename, merge, or split them in generated screens.
 
 Show only:
 
@@ -100,7 +102,7 @@ Place `취소` in a small close control rather than a third text button. Do not 
 
 ## Screen 3: Execution HUD
 
-Generate a compact persistent execution HUD attached near the top-right screen edge without covering the relevant Discord content. Target size is approximately 360 x 104.
+Generate a compact persistent execution HUD attached near the top-right screen edge without covering the current controlled context. Discord is visible for stage 1, the Doon result surface for stage 2 review, and Chrome with Hancom Docs for stages 3 and 4. Target size is approximately 360 x 104.
 
 Show:
 
@@ -114,13 +116,13 @@ The collapsed HUD has exactly two text lines plus the progress indicator and ico
 
 ## Screen 4: Checkpoint Review
 
-Generate a checkpoint review window after the document draft and formatting stage is complete. Preferred width is 520px, usable height up to 680px.
+Use this checkpoint window after every outcome-level stage. The pictured example is the review for stage 3, `document_formatted`, after the draft has been entered and formatted in Hancom Docs. Preferred width is 520px, usable height up to 680px.
 
 Keep the Doon-controlled Chrome window and Hancom Docs visibly recognizable around the checkpoint. The review pane may contain an opaque document preview, but it must not imply that the document was created directly inside Discord.
 
 Lead with the result:
 
-> 행사계획서 초안을 만들었습니다.
+> 한컴독스에 행사계획서를 작성하고 형식을 적용했습니다.
 
 Show a large, readable document preview for `2026 여름축제 행사계획서.hwp`. In the preview, reveal only the title and the first three section headings so the document itself remains the visual focus:
 
@@ -132,13 +134,13 @@ Below the preview, show one concise line: `요구사항 7개를 반영했고 저
 
 Explain the consequence:
 
-> 승인하면 이 문서를 학생회 문서 폴더에 저장하고 최종 형식을 확인합니다.
+> 승인하면 이 문서를 HWP로 내려받아 학생회 문서 폴더에 저장하고 파일을 확인합니다.
 
 Actions:
 
 - Primary `승인하고 계속`
 - Secondary `수정 요청`
-- Place `중단` in an overflow menu or safety icon control.
+- Put `다시 실행` in the overflow menu and keep `중단` as a safety icon control.
 
 Do not show a separate change-summary panel, checklist panel, evidence panel, or all seven sections outside the preview. When `수정 요청` is selected, replace the action row with one revision input attached directly to this result. Do not turn the whole window into a chat conversation.
 
@@ -185,7 +187,7 @@ Use an unframed main layout with a restrained navigation rail, but keep only `�
 After the six light-appearance screens are coherent:
 
 1. Generate dark-appearance variants using the exact semantic dark tokens in `DESIGN.md`.
-2. Generate long-Korean-copy variants for the command palette, checkpoint review, and failure state.
+2. Generate long-Korean-copy variants for the command palette, checkpoint review, and paused state.
 3. Generate keyboard-focus states for the primary flow.
 4. Connect the six screens into a clickable prototype in the listed order.
 
@@ -198,6 +200,7 @@ After the six light-appearance screens are coherent:
 - Glass panes visibly transmit and refract the active application for the current stage; no pane reads as an opaque white card.
 - Pause and stop remain available during execution.
 - Every approval shows a result and consequence.
+- Every one of the four stage results uses the same approval, revision, rerun, and stop contract before the next stage begins.
 - User input pauses Doon and requires explicit resume.
 - Risk and status are never communicated by color alone.
 - Korean text fits without clipped primary actions.
@@ -215,7 +218,7 @@ The current screens are too opaque and too dense. Regenerate each screen with un
 3. Command screen: show Doon header, command input, one compact context line, and `작업 계획 만들기`. Hide examples and scope copy behind `범위 보기`.
 4. Plan screen: show outcome, four compact stages, and `작업 시작` plus `범위 수정`. Collapse permissions and completion conditions into one disclosure.
 5. HUD screen: show exactly task, current stage, stage progress, pause icon, stop icon, and expand chevron. Hide the last event until expanded.
-6. Checkpoint screen: make the document preview dominant. Show only three section headings, one concise result line, `승인하고 계속`, and `수정 요청`. Put stop in overflow.
+6. Checkpoint screen: make the document preview dominant. Show only three section headings, one concise result line, `승인하고 계속`, and `수정 요청`. Put rerun in overflow and keep stop as a safety icon.
 7. Pause screen: show the paused state, one supporting sentence, current stage, `다시 시작`, and `현재 상태 보기`. Do not combine a recovery workflow into this screen.
 8. Completion screen: show the verified outcome, one file row, destination, `문서 열기`, `Finder에서 보기`, and one collapsed `작업 세부 정보`. Keep history, seven sections, privacy text, repeat action, and delete action out of the default view.
 
@@ -226,11 +229,6 @@ The desired impression is a small piece of optically layered macOS glass floatin
 - Project: [Doon Soft Amber Glass macOS UI](https://stitch.withgoogle.com/projects/6979018365994581050)
 - Generated: 2026-07-20
 - Visual direction: cool neutral macOS context, translucent functional glass, and soft butter-yellow `#E8CF72` actions
-- Superseded baseline set: corrected v2 command input, plan review, execution HUD, checkpoint review, user pause, and corrected v3 completed activity
-
-The first pass established the new yellow and glass material but incorrectly placed screens 1-5 inside a Doon dashboard shell. A six-screen correction pass restored Discord as the visible underlying application and limited Doon to compact contextual overlays. The completion screen required one final focused generation because Stitch retained invented analytics and sharing behavior from the first pass.
-
-The historical `6. 작업 완료 및 활동 기록 v3` frame was checked against the task contract before the later density correction. It contains the required HWP filename, destination, seven document sections, four task stages, Finder action, and local-only privacy disclosure. The banned assistant branding, arbitrary analytics, charts, algorithms, message counts, cloud/server language, and sharing action are absent.
 
 ### Glass and Density Correction
 
@@ -240,33 +238,6 @@ Latest reference screens:
 
 - `1. 명령 입력 v4`: canonical overlay reference. The full canvas is one crisp Discord window, only the pixels under the Doon pane are blurred, the pane has visible refractive edges and ambient depth, and no Doon dashboard or sidebar is present.
 - `2. 작업 계획 확인 v5`: four stage rows, one collapsed detail row, and the `작업 시작` decision are shown directly on one pane. Cards, permission blocks, estimates, and explanatory sections are removed.
-- `4. 중간 결과 확인 v5`: the HWP paper preview is the single visual focus. Only three document headings, one result line, and the approval actions remain; Discord stays visible around the review pane.
-- `3. 작업 수행 중 HUD v4`, `5. 사용자 제어로 일시정지 v4`, and `6. 작업 완료 및 활동 기록 v5`: generated as the compact continuation set using the same one-decision density contract.
-
-These generated frames are visual references for material, hierarchy, and density only. Where a later-stage frame still shows Discord, implementation must follow the stage context above and `TECH-STACK.md`: Chrome with Hancom Docs replaces Discord once document creation begins.
+- The remaining generated frames are composition references only. Their task data and backdrop are not implementation authority; regenerate them from the canonical four-stage contract and stage-appropriate Discord or Chrome/Hancom context above before implementation handoff.
 
 Manual canvas QA was performed at fit view and enlarged selection view. The individually corrected command, plan, and checkpoint screens no longer use a full-screen Doon shell and are substantially less dense. Stitch still adapts the glass membrane toward a darker tint on a dark Discord backdrop, so `DESIGN.md` remains the implementation authority for exact light and dark opacity, rim, sheen, saturation, and shadow values.
-
-## Previous Generated Stitch Project (Teal)
-
-- Project: [Doon macOS AI Operator UI](https://stitch.withgoogle.com/projects/10577694470069373924)
-- Generated: 2026-07-20
-- Primary scenario: student council Discord requirements to a local Korean HWP document
-- Final screen set: command input, plan review, execution HUD, checkpoint review, user pause, and completed activity
-
-The first generation drifted into an English enterprise operator console and changed the output to a Word document. A correction pass locked the product to a personal macOS utility, Korean interface, local HWP output, one consistent task, and user-controlled execution. Stitch generated five corrected screens in that pass, so the completed activity screen was generated separately as `6. 작업 완료 및 활동 기록 v2`.
-
-### Verified Final Data
-
-- Source: `Discord - 학생회`
-- Output: `2026 여름축제 행사계획서.hwp`
-- Destination: `학생회 문서/행사계획서`
-- Completion action: `Finder에서 보기`
-- Required sections: 행사 개요, 일정, 장소, 예산, 준비물, 역할 분담, 안전 계획
-- History: Discord requirements, document drafting, HWP formatting, and local folder save
-
-### Visual QA Result
-
-The final completion screen was checked in the live Stitch canvas and its rendered frame. It uses the Korean Doon navigation, exact file and folder data, seven verified sections, four-stage history, and a focused local-file action. The obsolete enterprise navigation, DOCX output, sharing workflow, and server-oriented copy are absent from the corrected screen.
-
-The project-level palette panel created by Stitch still displays its initially generated tertiary brown token and Hanken Grotesk specimen. The corrected product screens were explicitly prompted to use the Doon teal and macOS system typography, but the palette artifact itself should not be treated as canonical. `DESIGN.md` remains the source of truth when implementing the UI.
