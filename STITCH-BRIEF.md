@@ -95,8 +95,7 @@ Show only:
 
 - The outcome sentence.
 - The four compact stage rows.
-- Primary action `작업 시작` and secondary action `범위 수정`.
-- One collapsed `완료 조건 및 권한 보기` disclosure containing scope and completion conditions.
+- Primary action `작업 시작` and secondary action `범위 및 권한 수정`. The secondary action opens scope, permissions, and completion conditions in one place.
 
 Place `취소` in a small close control rather than a third text button. Do not add explanatory cards, app logos, permissions panels, estimated time, or low-level application switches.
 
@@ -178,7 +177,7 @@ Show:
 - A direct result row for `2026 여름축제 행사계획서.hwp`.
 - Destination `학생회 문서/행사계획서` and one concise verified status line.
 - Primary action `문서 열기` and secondary action `Finder에서 보기`.
-- One collapsed `작업 세부 정보` disclosure. Only when expanded may it show the four-stage history, verified sections, and privacy disclosure.
+- One compact detail icon with tooltip `작업 세부 정보`. Only when activated may it show the four-stage history, verified sections, and privacy disclosure; it is not a third visible text action.
 
 Use an unframed main layout with a restrained navigation rail, but keep only `활동` visibly selected and do not fill the first viewport with other navigation content. The completed file result occupies the visual center with generous empty space. Put `비슷한 작업 다시 맡기기` and `기록 삭제` in an overflow menu. Do not add charts, analytics, assistant biography, recommendation cards, or page sections inside floating cards.
 
@@ -216,11 +215,11 @@ The current screens are too opaque and too dense. Regenerate each screen with un
 1. Keep the real stage-appropriate context visibly recognizable behind every overlay: Discord for command, planning, and `requirements_collected`; a Doon result surface for `content_drafted`; then the Doon-controlled Chrome window with Hancom Docs for `document_formatted`, `file_saved`, and their reviews. Use a semi-transparent white-to-soft-amber membrane, 24-28px background blur, increased saturation, a bright top/left refractive rim, a darker bottom/right edge, a clipped upper specular sheen, and both short contact and diffuse ambient shadows. Do not use an opaque white or gray panel. Do not place a flat solid rectangle behind the whole overlay.
 2. Use generous negative space. Each screen shows one primary message, one supporting line, and one primary decision. Limit the default view to three information groups and two visible text actions.
 3. Command screen: show Doon header, command input, one compact context line, and `작업 계획 만들기`. Hide examples and scope copy behind `범위 보기`.
-4. Plan screen: show outcome, four compact stages, and `작업 시작` plus `범위 수정`. Collapse permissions and completion conditions into one disclosure.
+4. Plan screen: show outcome, four compact stages, and only `작업 시작` plus `범위 및 권한 수정`. The secondary action owns permissions and completion conditions; do not add a third disclosure row.
 5. HUD screen: show exactly task, current stage, stage progress, pause icon, stop icon, and expand chevron. Hide the last event until expanded.
 6. Checkpoint screen: make the document preview dominant. Show only three section headings, one concise result line, `승인하고 계속`, and `수정 요청`. Put rerun in overflow and keep stop as a safety icon.
 7. Pause screen: show the paused state, one supporting sentence, current stage, `다시 시작`, and `현재 상태 보기`. Do not combine a recovery workflow into this screen.
-8. Completion screen: show the verified outcome, one file row, destination, `문서 열기`, `Finder에서 보기`, and one collapsed `작업 세부 정보`. Keep history, seven sections, privacy text, repeat action, and delete action out of the default view.
+8. Completion screen: show the verified outcome, one file row, destination, `문서 열기`, `Finder에서 보기`, and one icon-only detail control with the tooltip `작업 세부 정보`. Keep history, seven sections, privacy text, repeat action, and delete action out of the default view.
 
 The desired impression is a small piece of optically layered macOS glass floating above the active work context, not a white SaaS card, dashboard, analytics page, or dense specification sheet.
 
