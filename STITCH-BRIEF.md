@@ -129,7 +129,7 @@ Show a large, readable document preview for `2026 여름축제 행사계획서.h
 - 추진 목적
 - 세부 일정
 
-Below the preview, show one concise line: `요구사항 7개를 반영했고 저장 전 최종 확인이 필요합니다.` Include the destination `학생회 문서/행사계획서` as muted metadata on the same line.
+Below the preview, show one concise line: `요구사항 7개를 반영했고 저장 전 최종 확인이 필요합니다.` Include the destination `학생회 문서 폴더` as muted metadata on the same line.
 
 Explain the consequence:
 
@@ -175,7 +175,7 @@ Lead with the verified outcome:
 Show:
 
 - A direct result row for `2026 여름축제 행사계획서.hwp`.
-- Destination `학생회 문서/행사계획서` and one concise verified status line.
+- Destination `학생회 문서 폴더` and one concise verified status line.
 - Primary action `문서 열기` and secondary action `Finder에서 보기`.
 - One compact detail icon with tooltip `작업 세부 정보`. Only when activated may it show the four-stage history, verified sections, and privacy disclosure; it is not a third visible text action.
 

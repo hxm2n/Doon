@@ -658,7 +658,7 @@ This surface is intentionally lower priority than the desktop product but must n
 - **Performance:** command palette should appear immediately after the global shortcut; expensive context gathering begins after the surface is visible.
 - **Overlay safety:** overlays must avoid focus theft, controlled content occlusion, and pointer conflicts.
 - **Privacy:** default interface must not expose secrets, full raw screen captures, or sensitive content in history previews.
-- **History retention:** completed, failed, and cancelled task history expires after 30 days; diagnostic action logs expire after 7 days. Deleting a task must cascade through its stages, approvals, revisions, and action logs without deleting the user's generated document.
+- **History retention:** completed, failed, and cancelled task history expires after 30 days; task-linked minimal action history in SQLite expires after 7 days. Separate taskless diagnostic files contain no task ID or user content and also expire after 7 days. Deleting a task must cascade through its stages, approvals, revisions, and task-linked action history without deleting the user's generated document.
 - **Renderer isolation:** Electron renderer windows must use context isolation, sandboxing, disabled Node integration, a restrictive CSP, and a narrow typed preload API. Privileged APIs and arbitrary IPC channels are never exposed to the renderer.
 - **Execution policy:** each GUI action must remain bound to the approved app, registered window, account confirmation, web origin, opaque output-folder capability, and action budget defined for the current stage.
 - **Compatibility:** macOS is the first supported environment; dark and light system appearance are both required.
