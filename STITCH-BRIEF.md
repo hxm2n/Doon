@@ -38,7 +38,7 @@ Design light appearance first at a 1440 x 900 desktop context. Use Korean as the
 Required visual behavior:
 
 - Native macOS visual grammar using the `Soft Amber Glass` material and restrained butter-yellow action color from `DESIGN.md`.
-- Make the material unmistakably glass: the Discord interface must remain faintly visible through each pane, colors must refract softly, and every pane needs a bright top/left rim, darker lower edge, clipped upper sheen, and diffuse ambient shadow. A translucent white rectangle with blur is not sufficient.
+- Make the material unmistakably glass: the active application for the current stage must remain faintly visible through each overlay. Use Discord for command, planning, and requirements collection; use the Doon-controlled Chrome window with Hancom Docs for document drafting, checkpoint, and document-stage pause states. Colors must refract softly, and every pane needs a bright top/left rim, darker lower edge, clipped upper sheen, and diffuse ambient shadow. A translucent white rectangle with blur is not sufficient.
 - Use a semi-transparent diagonal white-to-warm membrane rather than an opaque white panel. Preserve readable text with small localized reading patches, not by making the entire pane solid.
 - Maximum corner radius of 8px for panels and 6px for controls.
 - Use borders before shadows and never nest cards inside cards.
@@ -115,6 +115,8 @@ The collapsed HUD has exactly two text lines plus the progress indicator and ico
 ## Screen 4: Checkpoint Review
 
 Generate a checkpoint review window after the document draft and formatting stage is complete. Preferred width is 520px, usable height up to 680px.
+
+Keep the Doon-controlled Chrome window and Hancom Docs visibly recognizable around the checkpoint. The review pane may contain an opaque document preview, but it must not imply that the document was created directly inside Discord.
 
 Lead with the result:
 
@@ -193,7 +195,7 @@ After the six light-appearance screens are coherent:
 - The same task, document name, stage names, and destination persist throughout.
 - The current task, stage, status, and next decision are readable at a glance.
 - Every default screen has one dominant result or decision, no more than three information groups, and no more than two visible text actions.
-- Glass panes visibly transmit and refract the underlying Discord interface; no pane reads as an opaque white card.
+- Glass panes visibly transmit and refract the active application for the current stage; no pane reads as an opaque white card.
 - Pause and stop remain available during execution.
 - Every approval shows a result and consequence.
 - User input pauses Doon and requires explicit resume.
@@ -208,7 +210,7 @@ Apply this as a visual and density correction to all six existing screens in `Do
 
 The current screens are too opaque and too dense. Regenerate each screen with unmistakable optical glass and one-decision-at-a-time composition:
 
-1. Keep the real Discord interface visibly recognizable behind every overlay. Use a semi-transparent white-to-soft-amber membrane, 24-28px background blur, increased saturation, a bright top/left refractive rim, a darker bottom/right edge, a clipped upper specular sheen, and both short contact and diffuse ambient shadows. Do not use an opaque white or gray panel. Do not place a flat solid rectangle behind the whole overlay.
+1. Keep the real stage-appropriate application visibly recognizable behind every overlay: Discord during request and requirements stages, then the Doon-controlled Chrome window with Hancom Docs during drafting and review. Use a semi-transparent white-to-soft-amber membrane, 24-28px background blur, increased saturation, a bright top/left refractive rim, a darker bottom/right edge, a clipped upper specular sheen, and both short contact and diffuse ambient shadows. Do not use an opaque white or gray panel. Do not place a flat solid rectangle behind the whole overlay.
 2. Use generous negative space. Each screen shows one primary message, one supporting line, and one primary decision. Limit the default view to three information groups and two visible text actions.
 3. Command screen: show Doon header, command input, one compact context line, and `작업 계획 만들기`. Hide examples and scope copy behind `범위 보기`.
 4. Plan screen: show outcome, four compact stages, and `작업 시작` plus `범위 수정`. Collapse permissions and completion conditions into one disclosure.
@@ -217,18 +219,18 @@ The current screens are too opaque and too dense. Regenerate each screen with un
 7. Pause screen: show the paused state, one supporting sentence, current stage, `다시 시작`, and `현재 상태 보기`. Do not combine a recovery workflow into this screen.
 8. Completion screen: show the verified outcome, one file row, destination, `문서 열기`, `Finder에서 보기`, and one collapsed `작업 세부 정보`. Keep history, seven sections, privacy text, repeat action, and delete action out of the default view.
 
-The desired impression is a small piece of optically layered macOS glass floating above Discord, not a white SaaS card, dashboard, analytics page, or dense specification sheet.
+The desired impression is a small piece of optically layered macOS glass floating above the active work context, not a white SaaS card, dashboard, analytics page, or dense specification sheet.
 
 ## Current Generated Stitch Project
 
 - Project: [Doon Soft Amber Glass macOS UI](https://stitch.withgoogle.com/projects/6979018365994581050)
 - Generated: 2026-07-20
 - Visual direction: cool neutral macOS context, translucent functional glass, and soft butter-yellow `#E8CF72` actions
-- Final screen set: corrected v2 command input, plan review, execution HUD, checkpoint review, user pause, and corrected v3 completed activity
+- Superseded baseline set: corrected v2 command input, plan review, execution HUD, checkpoint review, user pause, and corrected v3 completed activity
 
 The first pass established the new yellow and glass material but incorrectly placed screens 1-5 inside a Doon dashboard shell. A six-screen correction pass restored Discord as the visible underlying application and limited Doon to compact contextual overlays. The completion screen required one final focused generation because Stitch retained invented analytics and sharing behavior from the first pass.
 
-The final `6. 작업 완료 및 활동 기록 v3` frame was checked against the exact task contract. It contains the required HWP filename, destination, seven document sections, four task stages, Finder action, and local-only privacy disclosure. The banned assistant branding, arbitrary analytics, charts, algorithms, message counts, cloud/server language, and sharing action are absent.
+The historical `6. 작업 완료 및 활동 기록 v3` frame was checked against the task contract before the later density correction. It contains the required HWP filename, destination, seven document sections, four task stages, Finder action, and local-only privacy disclosure. The banned assistant branding, arbitrary analytics, charts, algorithms, message counts, cloud/server language, and sharing action are absent.
 
 ### Glass and Density Correction
 
@@ -240,6 +242,8 @@ Latest reference screens:
 - `2. 작업 계획 확인 v5`: four stage rows, one collapsed detail row, and the `작업 시작` decision are shown directly on one pane. Cards, permission blocks, estimates, and explanatory sections are removed.
 - `4. 중간 결과 확인 v5`: the HWP paper preview is the single visual focus. Only three document headings, one result line, and the approval actions remain; Discord stays visible around the review pane.
 - `3. 작업 수행 중 HUD v4`, `5. 사용자 제어로 일시정지 v4`, and `6. 작업 완료 및 활동 기록 v5`: generated as the compact continuation set using the same one-decision density contract.
+
+These generated frames are visual references for material, hierarchy, and density only. Where a later-stage frame still shows Discord, implementation must follow the stage context above and `TECH-STACK.md`: Chrome with Hancom Docs replaces Discord once document creation begins.
 
 Manual canvas QA was performed at fit view and enlarged selection view. The individually corrected command, plan, and checkpoint screens no longer use a full-screen Doon shell and are substantially less dense. Stitch still adapts the glass membrane toward a darker tint on a dark Discord backdrop, so `DESIGN.md` remains the implementation authority for exact light and dark opacity, rim, sheen, saturation, and shadow values.
 

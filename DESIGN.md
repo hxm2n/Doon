@@ -14,7 +14,7 @@
   - [Apple DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/apple/DESIGN.md)
   - [Linear DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/linear.app/DESIGN.md)
   - [Zapier DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/zapier/DESIGN.md)
-- **Evidence currently absent:** product UI implementation, logo, screenshots, Figma files, brand assets, component library, finalized frontend or desktop framework
+- **Evidence currently absent:** product UI implementation, logo, screenshots, Figma files, brand assets, and a finalized component library
 
 This document is the canonical design contract for Doon. Product and frontend work should follow it unless a later validated decision updates this file.
 
@@ -649,7 +649,7 @@ This surface is intentionally lower priority than the desktop product but must n
 
 ## Implementation constraints
 
-- **Desktop framework:** not selected; the choice must support macOS accessibility APIs, global shortcuts, menu bar presence, system permissions, multi-window behavior, notifications, and signed distribution.
+- **Desktop framework:** Electron + React + TypeScript + Vite is selected for the MVP, with a minimal Swift helper for native macOS control. Follow [`TECH-STACK.md`](./TECH-STACK.md); the implementation must support accessibility APIs, global shortcuts, menu bar presence, system permissions, multi-window behavior, notifications, and signed distribution.
 - **Website framework:** not selected; defer implementation until the desktop product has a stable download artifact and real product media.
 - **Design tokens:** implement the semantic token names from this document before adding component-specific colors.
 - **Performance:** command palette should appear immediately after the global shortcut; expensive context gathering begins after the surface is visible.
@@ -662,7 +662,7 @@ This surface is intentionally lower priority than the desktop product but must n
 
 ## Open questions
 
-- [ ] Choose native macOS versus cross-platform desktop framework / Engineering / determines component and window behavior
+- [ ] Validate the Electron overlay and Swift helper boundary in a packaged arm64 prototype / Engineering / determines whether the selected stack satisfies native control and window behavior
 - [ ] Select the Doon logo and final brand mark / Product and Design / affects iconography and installation website
 - [ ] Validate Soft Amber Glass tokens against varied wallpapers and applications in light, dark, increased-contrast, and reduced-transparency modes / Design / affects contrast and brand recognition
 - [ ] Choose global pause and emergency-stop shortcuts / Product and Engineering / affects safety and accessibility
