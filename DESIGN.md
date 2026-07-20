@@ -1,0 +1,603 @@
+# Design
+
+## Source of truth
+
+- **Status:** Draft
+- **Last refreshed:** 2026-07-20
+- **Primary product surfaces:** macOS desktop app, system overlay surfaces, onboarding and permissions, activity and settings window
+- **Secondary product surface:** desktop app installation website (planned after the core desktop experience)
+- **Evidence reviewed:**
+  - [`PRD-Doon.md`](./PRD-Doon.md)
+  - [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
+  - [Raycast DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/raycast/DESIGN.md)
+  - [Apple DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/apple/DESIGN.md)
+  - [Linear DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/linear.app/DESIGN.md)
+  - [Zapier DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/zapier/DESIGN.md)
+- **Evidence currently absent:** product UI implementation, logo, screenshots, Figma files, brand assets, component library, finalized frontend or desktop framework
+
+This document is the canonical design contract for Doon. Product and frontend work should follow it unless a later validated decision updates this file.
+
+## Brand
+
+### Personality
+
+Doon should feel capable, calm, precise, and respectful. It works inside a personal computer, so it must behave more like a reliable operating-system utility than an expressive chatbot or futuristic AI showcase.
+
+The brand should communicate:
+
+- Quiet competence rather than spectacle
+- Clear intent rather than mysterious intelligence
+- Helpful presence without demanding attention
+- User ownership rather than autonomous authority
+- Familiar desktop behavior with a distinct but restrained identity
+
+### Trust signals
+
+- Show what Doon is currently doing and why it matters to the task.
+- State which screen, file, account, or capability is being accessed.
+- Keep pause and stop controls available during execution.
+- Present meaningful results before asking for approval.
+- Explain external or irreversible effects before execution.
+- Make stored history, permissions, and learned preferences inspectable and deletable.
+- Use signed and notarized installers, visible version information, and clear privacy language on the installation website.
+
+### Avoid
+
+- Purple-blue gradients as the dominant identity
+- Glowing AI orbs, bokeh, particle fields, or ambient decorative blobs
+- Sci-fi control-room visuals and theatrical cursor movement
+- Anthropomorphic claims such as "Doon is thinking like you"
+- Constant chat bubbles when a status, preview, or direct command is clearer
+- Excessive rounded pills, nested cards, and floating-card page sections
+- Dark mode as a requirement for the brand; system appearance should lead
+- Visual noise that competes with the user's active application
+- Generic stock imagery that does not show the real product
+
+## Product goals
+
+### Goals
+
+- Let a user invoke Doon without leaving the current computer workflow.
+- Convert a natural-language outcome into visible, meaningful work stages.
+- Make execution understandable without exposing every low-level click.
+- Let the user approve, revise, pause, or stop at the right moments.
+- Preserve a clear boundary between Doon's control and the user's control.
+- Make privacy, permissions, recovery, and completion visible product features.
+- Let the installation website establish trust and deliver the desktop app with minimal friction.
+
+### Non-goals
+
+- Entertaining the user with animated automation
+- Reproducing a full desktop inside the Doon interface
+- Requiring the user to manage low-level action logs during normal work
+- Presenting every task as a long chat conversation
+- Hiding risk, permission scope, failure, or partial completion behind vague language
+- Turning the installation website into a generic AI marketing page
+
+### Success signals
+
+- A new user can invoke Doon and understand the first action without instruction.
+- A user can identify the current stage and regain control within one interaction.
+- Approval requests explain the result and consequence without requiring log inspection.
+- Users can distinguish running, waiting, paused, failed, and completed states at a glance.
+- The Doon overlay does not obscure the content being operated on.
+- The installation website makes supported systems, permissions, version, and download action immediately clear.
+
+## Personas and jobs
+
+### Primary personas
+
+- People who use a laptop for multi-step digital work but do not want to configure automation tools
+- People who value the result of a task more than performing repetitive computer operations
+- People willing to delegate execution while retaining approval and interruption rights
+
+The product should not assume developer knowledge. Terminal terminology, API concepts, model names, and automation internals must not appear in the default experience.
+
+### User jobs
+
+- Tell Doon the desired outcome in natural language.
+- Understand what context Doon intends to use.
+- Review meaningful intermediate results.
+- Approve, revise, pause, resume, or stop work.
+- Verify the final result and any external effects.
+- Inspect and change permissions, history, and learned preferences.
+- Install or update the desktop app from an official, trustworthy source.
+
+### Key contexts of use
+
+- The user is already focused in another application.
+- The task may cross multiple windows or tools.
+- The user may watch closely, switch to another activity, or return only for approval.
+- The active content may be personal, confidential, or difficult to undo.
+- Network availability and third-party interfaces may change during execution.
+
+## Information architecture
+
+### Desktop surfaces
+
+1. **Command Palette**
+   - Global shortcut entry point
+   - Natural-language input
+   - Current-context summary and removable context chips
+   - Optional scope and destination controls when needed
+
+2. **Execution HUD**
+   - Compact, persistent status near a screen edge
+   - Current stage, current goal, pause, and stop
+   - Expands into detail only on request or when blocked
+
+3. **Checkpoint Review**
+   - Stage result and completion criteria
+   - Result preview or change summary
+   - `Approve`, `Revise`, and `Stop` actions
+   - Revision input remains attached to the result being revised
+
+4. **Main Window**
+   - Current and recent tasks
+   - Task detail and stage history
+   - Recovery and resume actions
+   - Permissions and privacy
+   - Preferences and learned memory
+
+5. **Onboarding**
+   - Product promise
+   - Permission rationale before each operating-system prompt
+   - Global shortcut setup
+   - First controlled task
+
+6. **System Notifications**
+   - Only for approval needed, blocked work, completion, or material failure
+   - Never notify for every low-level action
+
+### Installation website surfaces
+
+The website is a future but required product surface. It is responsible for download, trust, and installation guidance, not only promotion.
+
+- **Home and Download:** Doon name, literal offer, actual product visual, primary desktop download action
+- **Installation Guide:** system requirements, permissions, setup sequence, troubleshooting
+- **Security and Privacy:** local-versus-remote processing, stored data, permission scope, deletion controls
+- **Release Notes:** version, release date, fixes, known limitations
+- **Help:** onboarding and recovery guidance
+
+### Content hierarchy
+
+For every active task, use this hierarchy:
+
+1. Current task outcome
+2. Current stage and status
+3. Result or action requiring user judgment
+4. Primary next action
+5. Supporting details, scope, and logs
+
+Do not lead with model reasoning, raw screenshots, coordinates, or click history.
+
+## Design principles
+
+### 1. Outcome over spectacle
+
+Show what changed, what remains, and whether the requested outcome is satisfied. Cursor movement is supporting evidence, not the main product content.
+
+### 2. Meaningful checkpoints, not permission fatigue
+
+Ask for input when the user can judge a stage result or when an action creates meaningful risk. Do not ask for approval for every click, text entry, or window change.
+
+### 3. Never steal control
+
+User mouse or keyboard input in the controlled context pauses Doon immediately. The HUD must make the handoff visible and offer an explicit resume action. Doon must never fight the user for pointer or keyboard focus.
+
+### 4. Show scope before confidence
+
+Trust comes from showing what Doon can access and affect, not from confident language. Scope, destination, external effects, and completion conditions must be visible when relevant.
+
+### 5. Native before branded
+
+Follow macOS conventions for windows, menus, shortcuts, focus, permissions, notifications, and system appearance. Brand expression should not make standard desktop behavior unfamiliar.
+
+### 6. Progressive disclosure
+
+Default surfaces show only the current goal, status, and next decision. Plans, evidence, action logs, permissions, and recovery detail remain available without occupying the default view.
+
+### 7. Recovery is a primary flow
+
+Partial success, changed interfaces, missing permissions, and interrupted work are expected states. Recovery UI must preserve completed work and present a clear next action.
+
+### Tradeoffs
+
+- More visibility can improve trust but increase distraction. Prefer compact status plus on-demand detail.
+- More approvals can improve safety but return coordination burden to the user. Approve results and meaningful risk boundaries only.
+- More personalization can improve speed but raise privacy concerns. Make memory opt-in, inspectable, scoped, and deletable.
+- More custom branding can increase recognition but reduce desktop familiarity. Favor native interaction and restrained visual ownership.
+
+## Visual language
+
+### Theme and atmosphere
+
+The default visual character is a quiet system utility with crisp information hierarchy, neutral surfaces, restrained color, and limited elevation. Doon supports system light and dark appearance from the same semantic token model.
+
+The desktop app should be visually quieter than the installation website. The website can use more space and product media, but it must still show the real Doon interface rather than abstract AI imagery.
+
+### Color tokens
+
+Use semantic names in code. Hex values are provisional until visual implementation review.
+
+| Token | Light | Dark | Role |
+| :--- | :--- | :--- | :--- |
+| `canvas` | `#F5F6F7` | `#17191C` | Main window background |
+| `surface` | `#FFFFFF` | `#202329` | Panels and controls |
+| `surface-elevated` | `#EEF1F3` | `#292D34` | Selected and elevated regions |
+| `border` | `#D8DDE2` | `#3A4048` | Standard boundaries |
+| `border-strong` | `#B9C0C8` | `#59616C` | Focused or important boundaries |
+| `text-primary` | `#17191C` | `#F5F7FA` | Primary text |
+| `text-secondary` | `#5E656E` | `#B5BBC4` | Supporting text |
+| `text-tertiary` | `#858D97` | `#89919C` | Metadata and disabled text |
+| `action` | `#0B6F69` | `#62D0C4` | Primary action and focus |
+| `on-action` | `#FFFFFF` | `#102522` | Text on primary action |
+| `info` | `#2563A8` | `#70A7E8` | Informational state |
+| `success` | `#1F7A46` | `#65C98C` | Completed and verified state |
+| `warning` | `#A95F00` | `#E2A34B` | Caution and blocked state |
+| `danger` | `#B9342C` | `#F07A72` | Destructive action and failure |
+| `focus-ring` | `#147D78` | `#79D8CE` | Keyboard focus indicator |
+
+Rules:
+
+- Do not use status colors as large decorative backgrounds.
+- Do not communicate state through color alone; pair color with icon and text.
+- Reserve `action` for primary interaction, active focus, and Doon identity.
+- Use neutral surfaces for most of the interface so active content remains dominant.
+
+### Typography
+
+- **Desktop family:** SF Pro Text / SF Pro Display through macOS system fonts
+- **Website family:** system UI stack first; a brand typeface may be evaluated later
+- **Monospace:** SF Mono only for shortcuts, paths, identifiers, or technical detail
+- **Letter spacing:** `0` across all interface text
+
+| Style | Size | Weight | Line height | Use |
+| :--- | :--- | :--- | :--- | :--- |
+| `title` | 24px | 600 | 32px | Main window titles and completed outcome |
+| `heading` | 18px | 600 | 26px | Panel and checkpoint headings |
+| `subheading` | 15px | 600 | 22px | Stage labels and grouped controls |
+| `body` | 14px | 400 | 21px | Default desktop text |
+| `body-strong` | 14px | 600 | 21px | Emphasized result and action labels |
+| `compact` | 13px | 400 | 18px | HUD and dense metadata |
+| `caption` | 12px | 400 | 17px | Timestamp, scope, and secondary metadata |
+| `command-input` | 16px | 400 | 24px | Natural-language request and revision input |
+| `website-display` | 56px | 600 | 64px | Desktop website hero only |
+
+Website display type steps down to 40px on narrow screens. Do not scale font size continuously with viewport width.
+
+### Spacing and layout rhythm
+
+- Base unit: `4px`
+- Scale: `4, 8, 12, 16, 24, 32, 48, 64`
+- Compact HUD and palette controls use `8-12px` internal gaps.
+- Checkpoint and main-window sections use `16-24px` internal spacing.
+- Website content bands use `48-64px` vertical spacing.
+- Use full-width sections with constrained inner content on the website; do not make every section a floating card.
+
+### Shape, radius, and elevation
+
+- Radius scale: `4px`, `6px`, `8px`
+- Buttons and inputs: `6px`
+- Panels, result previews, and repeated item cards: `8px` maximum
+- Status chips may use a full radius only when the pill shape communicates compact metadata.
+- Use `1px` borders before adding shadows.
+- Overlay elevation: `0 10px 32px rgba(0, 0, 0, 0.16)` in light mode and `0 12px 36px rgba(0, 0, 0, 0.36)` in dark mode.
+- Do not place cards inside cards. Use dividers, grouped rows, or unframed content regions inside a panel.
+
+### Motion
+
+- Standard state transition: `120-180ms`, ease-out
+- Panel expansion: maximum `220ms`
+- Respect Reduce Motion by removing translation and scale; retain opacity or instant state change.
+- Do not animate the cursor for demonstration when Doon is not actually controlling it.
+- Never delay user control, status updates, or error visibility for animation.
+
+### Imagery and iconography
+
+- Use SF Symbols in native macOS surfaces when suitable.
+- Use Lucide icons for web implementation or cross-platform surfaces when SF Symbols are unavailable.
+- Icons support text for uncommon or consequential actions.
+- The installation website must use real product screenshots or a clear task-flow recording as its primary visual asset.
+- Do not use generated abstract AI artwork as the main explanation of the product.
+
+## Components
+
+### Existing components to reuse
+
+No implementation or component library exists yet. Prefer native macOS controls and system behavior before introducing custom controls.
+
+### Desktop components
+
+- `CommandPalette`
+- `CommandInput`
+- `ContextChip`
+- `ScopeDisclosure`
+- `TaskPlan`
+- `StageRow`
+- `ExecutionHUD`
+- `StatusBadge`
+- `CheckpointReview`
+- `ResultPreview`
+- `ChangeSummary`
+- `ApprovalBar`
+- `RevisionInput`
+- `RiskDisclosure`
+- `RiskConfirmDialog`
+- `PauseControl`
+- `RecoveryPanel`
+- `ActivityTimeline`
+- `PermissionRow`
+- `MemoryItem`
+- `EmptyState`
+- `SystemNotification`
+
+### Installation website components
+
+- `DownloadButton`
+- `SystemRequirementSummary`
+- `VersionMetadata`
+- `ProductDemo`
+- `PermissionExplainer`
+- `SecuritySummary`
+- `ReleaseNoteItem`
+- `InstallTroubleshooting`
+
+### Variants and states
+
+All interactive components must define:
+
+- Default
+- Hover, where pointer input applies
+- Keyboard focus
+- Pressed
+- Disabled with reason when useful
+- Loading or pending
+- Error
+- Success, when the component represents completion
+
+Risk controls additionally define `normal`, `caution`, `external-effect`, and `destructive` variants.
+
+### Token and component ownership
+
+- Semantic tokens belong in one shared theme definition per implementation surface.
+- Desktop-native and website components may have different implementations but must share semantic names and status meaning.
+- A new component is justified only when native controls or an existing Doon component cannot express the required behavior.
+
+## Interaction model
+
+### Task states
+
+| State | User-facing label | Required UI behavior |
+| :--- | :--- | :--- |
+| `ready` | Ready | Command input is focused and contextual scope is visible. |
+| `interpreting` | Understanding request | Show activity without claiming execution has begun. |
+| `needs_clarification` | More information needed | Ask the minimum blocking question and preserve the request. |
+| `planned` | Ready to start | Show outcome-level stages and relevant scope. |
+| `executing` | Working | HUD shows current stage and pause/stop controls. |
+| `awaiting_review` | Review needed | Bring the checkpoint result forward without stealing focus while the user is typing elsewhere. |
+| `revising` | Applying changes | Keep the accepted result and revision instruction visible. |
+| `paused_by_user` | Paused by you | Explain that user input caused the pause and offer resume. |
+| `blocked` | Needs attention | State what is missing and the smallest recovery action. |
+| `failed` | Could not complete | Preserve completed stages and offer retry, alternate path, or manual takeover. |
+| `completed` | Completed | Show verified outcome and changed or created items. |
+| `cancelled` | Stopped | Show what was already changed and whether cleanup is needed. |
+
+### Checkpoint contract
+
+Every checkpoint must answer:
+
+1. What stage was completed?
+2. What result did Doon produce or change?
+3. What should the user judge?
+4. What happens after approval?
+
+Actions:
+
+- Primary: `Approve and continue`
+- Secondary: `Revise`
+- Tertiary: `Stop`
+
+Do not use a generic `OK` button. Risk confirmation copy must name the actual effect.
+
+### Control handoff
+
+- User input in the controlled context pauses Doon immediately.
+- The Execution HUD changes to `Paused by you` and shows `Resume`.
+- Doon must release pointer and keyboard control before displaying the pause state.
+- Doon does not automatically resume after user input.
+- Stop remains available from the HUD and main window.
+- Exact global pause and emergency-stop shortcuts remain an open implementation decision.
+
+### Risk levels
+
+- **Level 0, observational:** Read or inspect within approved scope. No additional confirmation after scope approval.
+- **Level 1, reversible local:** Create or edit recoverable local work. Confirm at the stage result.
+- **Level 2, external effect:** Send, share, publish, upload, or modify a shared resource. Confirm immediately before the effect.
+- **Level 3, destructive or financial:** Delete, pay, deploy, change security settings, or perform difficult-to-reverse actions. Use a dedicated confirmation with consequence and target.
+
+## Accessibility
+
+- **Target standard:** WCAG 2.2 AA for the website and equivalent keyboard and assistive-technology support for the desktop app
+- The entire command, review, approval, pause, resume, and stop flow must be keyboard operable.
+- Focus must move predictably when the palette opens, a checkpoint arrives, or a dialog closes.
+- Use a visible `2px` focus indicator with sufficient contrast.
+- Status must use text and icon in addition to color.
+- Result previews must expose semantic headings, lists, and change descriptions.
+- Respect system text size where the desktop framework permits it.
+- Respect Reduce Motion and increased-contrast settings.
+- Avoid relying on hover for essential explanation or actions.
+- Website touch targets must be at least `44px`; compact desktop controls should be at least `32px` unless a native macOS control defines otherwise.
+- Korean and English text must fit without truncating primary actions or status messages.
+
+## Responsive behavior
+
+### Desktop app
+
+- Primary target: macOS laptop displays from `1280x720` upward.
+- Command palette: preferred width `640px`, minimum width `520px`, maximum visible height `540px` before internal scrolling.
+- Execution HUD: fixed compact dimensions; dynamic text must wrap or truncate without shifting controls.
+- Checkpoint review: preferred width `480px`, usable range `420-560px`.
+- Main window: preferred minimum `920x640`; collapse secondary metadata before reducing primary result space.
+- Overlays must remain fully visible inside the active display's safe area and account for multiple monitors.
+
+### Installation website
+
+- Breakpoints: narrow below `720px`, standard `720-1079px`, wide from `1080px`.
+- Navigation condenses on narrow screens, but the download action remains visible.
+- The first viewport shows the Doon name, literal product offer, download action, and real product visual with a hint of the next section.
+- On mobile, explain that Doon installs on desktop and offer a non-blocking way to continue later; do not imitate a desktop download.
+- Product screenshots keep a stable aspect ratio and must not be heavily cropped or blurred.
+
+## Interaction states
+
+### Loading
+
+- Distinguish request interpretation from computer execution.
+- Show the current stage, last completed event, and whether user input is required.
+- Avoid fake percentages when work cannot be measured reliably.
+
+### Empty
+
+- Command palette: focus the input and show no more than three outcome-oriented examples.
+- Activity: explain that completed and interrupted work will appear here after the first task.
+- Memory: state that nothing has been learned or saved and link to the memory policy.
+
+### Error
+
+- Name the failed stage and user-visible consequence.
+- Preserve completed work and show retry, alternate path, or manual takeover when available.
+- Do not expose raw stack traces in the default view.
+
+### Success
+
+- State the completed outcome first.
+- List created, changed, sent, or saved items.
+- Offer direct access to the result when possible.
+- Do not use celebratory animation for routine completion.
+
+### Disabled
+
+- Explain missing permission, unavailable context, unsupported action, or conflicting state.
+- Do not leave consequential controls disabled without a discoverable reason.
+
+### Offline or slow network
+
+- Distinguish local work that can continue from remote work that is blocked.
+- Preserve task state and explain whether Doon will retry or wait for user action.
+
+## Content voice
+
+### Tone
+
+- Direct, calm, specific, and concise
+- Confident only about observed state
+- Transparent about uncertainty, failure, and side effects
+- Helpful without pretending to be human
+
+### Terminology
+
+- Use `task` for the user's overall requested outcome.
+- Use `stage` for an outcome-level unit of work.
+- Use `action` only for low-level execution detail.
+- Use `review` for a user decision on a stage result.
+- Use `permission` for durable access and `confirmation` for a specific consequential effect.
+
+Korean UI should consistently use:
+
+- 작업
+- 단계
+- 결과 확인
+- 승인하고 계속
+- 수정 요청
+- 일시정지
+- 다시 시작
+- 중단
+- 완료
+
+### Microcopy rules
+
+- Lead with the result: `문서 초안을 만들었습니다.`
+- Name the blocker: `이 폴더에 접근할 권한이 필요합니다.`
+- Name the consequence: `승인하면 이 메시지가 상대방에게 전송됩니다.`
+- Avoid vague status: `처리 중`, `무언가 잘못되었습니다`, `AI가 생각 중입니다.`
+- Avoid false certainty: replace `완벽하게 완료했습니다` with the verified outcome.
+- Button labels describe the action; do not use `확인` or `예` when a more specific label fits.
+
+## Installation website direction
+
+This surface is intentionally lower priority than the desktop product but must not be forgotten. It is part of the installation and trust journey.
+
+### First viewport
+
+- H1: `Doon`
+- Supporting offer: `하고 싶은 일을 말하면, Doon이 컴퓨터에서 끝냅니다.`
+- Primary action: `Download for macOS`
+- Supporting metadata: current version, system requirement, signed and notarized status
+- Primary visual: a real command-to-checkpoint-to-result product recording or screenshot sequence
+- Hero text sits directly over or beside the real product scene without being placed in a decorative card.
+
+### Required content bands
+
+1. Real product workflow
+2. User control and stage reviews
+3. Privacy and permission model
+4. Installation steps and system requirements
+5. Download and release information
+
+### Homepage guardrails
+
+- The page sells a working desktop product, not a future AI vision.
+- Doon and the download action are first-viewport signals.
+- Use actual product state and outcomes as proof.
+- Avoid generic feature-card grids, abstract AI imagery, and testimonial sections before real users exist.
+- Keep a hint of the next content band visible on common desktop and mobile viewports.
+- Download failure, unsupported operating system, outdated OS, and update states need explicit designs.
+
+## Do and do not
+
+### Do
+
+- Design around the user's current task and current application.
+- Keep the current goal and state readable at a glance.
+- Use real previews, diffs, targets, and consequences.
+- Keep recovery and interruption visible.
+- Show access scope and stored memory in plain language.
+- Use restrained semantic color and system-native behavior.
+- Validate desktop overlays on small displays and multiple monitors.
+
+### Do not
+
+- Turn raw action logs into the primary progress interface.
+- Ask for approval without a result or consequence to judge.
+- Let an overlay cover the object Doon is operating on.
+- Resume control silently after user input.
+- Use color alone for status or risk.
+- Hide partial completion when a later stage fails.
+- Copy Raycast, Apple, Linear, or Zapier tokens and visual signatures directly.
+- Build the installation homepage before the desktop product has a truthful visual to show.
+
+## Implementation constraints
+
+- **Desktop framework:** not selected; the choice must support macOS accessibility APIs, global shortcuts, menu bar presence, system permissions, multi-window behavior, notifications, and signed distribution.
+- **Website framework:** not selected; defer implementation until the desktop product has a stable download artifact and real product media.
+- **Design tokens:** implement the semantic token names from this document before adding component-specific colors.
+- **Performance:** command palette should appear immediately after the global shortcut; expensive context gathering begins after the surface is visible.
+- **Overlay safety:** overlays must avoid focus theft, controlled content occlusion, and pointer conflicts.
+- **Privacy:** default interface must not expose secrets, full raw screen captures, or sensitive content in history previews.
+- **Compatibility:** macOS is the first supported environment; dark and light system appearance are both required.
+- **Localization:** Korean is first-class; layout and controls must remain valid in English.
+- **Testing:** every stateful component requires keyboard, focus, reduced-motion, light/dark, error, and long-Korean-text checks.
+- **Visual QA:** desktop surfaces must be screenshot-tested at `1280x720`, `1440x900`, and a wide display. The installation website must be tested at narrow, standard, and wide breakpoints.
+
+## Open questions
+
+- [ ] Choose native macOS versus cross-platform desktop framework / Engineering / determines component and window behavior
+- [ ] Select the Doon logo and final brand mark / Product and Design / affects iconography and installation website
+- [ ] Validate provisional color tokens in real light and dark desktop prototypes / Design / affects contrast and brand recognition
+- [ ] Choose global pause and emergency-stop shortcuts / Product and Engineering / affects safety and accessibility
+- [ ] Define exact conditions that create a stage checkpoint / Product / affects approval fatigue and safety
+- [ ] Decide how much action evidence is retained locally and for how long / Product and Security / affects trust and recovery
+- [ ] Decide local-versus-remote processing disclosures / Engineering and Security / affects onboarding and website copy
+- [ ] Define signed installer, update mechanism, system requirements, and release metadata / Engineering / blocks installation website completion
+- [ ] Produce a truthful desktop product recording before designing the website hero / Product and Design / blocks final website visual direction
