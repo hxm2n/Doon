@@ -21,6 +21,12 @@ import type {
 } from "../shared/task-model";
 import { parseOptionalTaskSnapshot } from "../shared/task-snapshot-parser";
 import {
+  type CaptureWindowInput,
+  captureWindowInputSchema,
+  type WindowCaptureSnapshot,
+  windowCaptureSnapshotSchema,
+} from "../shared/window-capture-model";
+import {
   type FocusTargetAppInput,
   focusTargetAppInputSchema,
   type WindowDiscoverySnapshot,
@@ -46,6 +52,7 @@ export type DoonApi = {
   readonly readAccessibilityTree: (
     input: ReadAccessibilityTreeInput,
   ) => Promise<AccessibilityTreeSnapshot>;
+  readonly captureWindow: (input: CaptureWindowInput) => Promise<WindowCaptureSnapshot>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -105,6 +112,10 @@ const doonApi: DoonApi = {
         "doon:read-accessibility-tree",
         readAccessibilityTreeInputSchema.parse(input),
       ),
+    ),
+  captureWindow: async (input) =>
+    windowCaptureSnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:capture-window", captureWindowInputSchema.parse(input)),
     ),
   getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),

@@ -17,8 +17,10 @@ import {
   stageActionInputSchema,
   type TaskSnapshot,
 } from "../shared/task-model";
+import { captureWindowInputSchema } from "../shared/window-capture-model";
 import { focusTargetAppInputSchema } from "../shared/window-discovery-model";
 import {
+  captureWindowSnapshot,
   focusTargetApp,
   readAccessibilityTreeSnapshot,
   readWindowDiscoverySnapshot,
@@ -101,6 +103,11 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:read-accessibility-tree", (_event, payload: unknown) => {
     const input = readAccessibilityTreeInputSchema.parse(payload);
     return readAccessibilityTreeSnapshot(input);
+  });
+
+  ipcMain.handle("doon:capture-window", (_event, payload: unknown) => {
+    const input = captureWindowInputSchema.parse(payload);
+    return captureWindowSnapshot(input);
   });
 
   ipcMain.handle("doon:complete-onboarding", () => {
