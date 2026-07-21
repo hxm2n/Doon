@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { z } from "zod";
+import { type OnboardingStatus, onboardingStatusSchema } from "../shared/onboarding-model";
 import type {
   CreateTaskInput,
   RevisionInput,
@@ -15,6 +16,9 @@ export type DoonAppInfo = {
 
 export type DoonApi = {
   readonly getAppInfo: () => Promise<DoonAppInfo>;
+  readonly getOnboardingStatus: () => Promise<OnboardingStatus>;
+  readonly completeOnboarding: () => Promise<OnboardingStatus>;
+  readonly resetOnboarding: () => Promise<OnboardingStatus>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -44,6 +48,12 @@ const invokeTask = async (
 
 const doonApi: DoonApi = {
   getAppInfo: async () => appInfoSchema.parse(await ipcRenderer.invoke("doon:app-info")),
+  getOnboardingStatus: async () =>
+    onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:get-onboarding-status")),
+  completeOnboarding: async () =>
+    onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:complete-onboarding")),
+  resetOnboarding: async () =>
+    onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:reset-onboarding")),
   getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),
   startStage: (input) => invokeTask("doon:start-stage", input),

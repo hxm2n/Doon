@@ -1,5 +1,6 @@
 import path from "node:path";
 import { app, BrowserWindow, globalShortcut, ipcMain } from "electron";
+import { completeOnboardingStatus, resetOnboardingStatus } from "../shared/onboarding-model";
 import {
   approveStage,
   cancelTask,
@@ -71,6 +72,20 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   }));
 
   ipcMain.handle("doon:get-current-task", () => currentTask);
+
+  ipcMain.handle("doon:get-onboarding-status", () => repository.loadOnboardingStatus());
+
+  ipcMain.handle("doon:complete-onboarding", () => {
+    const onboardingStatus = completeOnboardingStatus(new Date().toISOString());
+    repository.saveOnboardingStatus(onboardingStatus);
+    return onboardingStatus;
+  });
+
+  ipcMain.handle("doon:reset-onboarding", () => {
+    const onboardingStatus = resetOnboardingStatus();
+    repository.saveOnboardingStatus(onboardingStatus);
+    return onboardingStatus;
+  });
 
   ipcMain.handle("doon:create-task", (_event, payload: unknown) => {
     const input = createTaskInputSchema.parse(payload);

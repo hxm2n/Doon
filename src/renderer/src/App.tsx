@@ -1,6 +1,5 @@
 import {
   Check,
-  ChevronDown,
   CircleStop,
   FileCheck,
   Pause,
@@ -10,28 +9,58 @@ import {
   Shield,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { OnboardingStatus } from "../../shared/onboarding-model";
 import { type StageId, stageDefinitions, type TaskSnapshot } from "../../shared/task-model";
+import { OnboardingPanel } from "./OnboardingPanel";
 
 const defaultCommand =
   "학생회 디스코드에서 행사 계획서 요구사항을 확인하고, 형식에 맞는 한글 문서를 만들어서 학생회 문서 폴더에 저장해줘.";
 
 export const App = () => {
   const [command, setCommand] = useState(defaultCommand);
+  const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatus | undefined>(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
 
   useEffect(() => {
     let isMounted = true;
-    window.doon.getCurrentTask().then((savedTask) => {
-      if (isMounted) {
-        setTask(savedTask);
-      }
-    });
+    Promise.all([window.doon.getOnboardingStatus(), window.doon.getCurrentTask()]).then(
+      ([savedOnboardingStatus, savedTask]) => {
+        if (isMounted) {
+          setOnboardingStatus(savedOnboardingStatus);
+          setTask(savedTask);
+        }
+      },
+    );
 
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const completeOnboarding = async () => {
+    setOnboardingStatus(await window.doon.completeOnboarding());
+  };
+
+  const resetOnboarding = async () => {
+    const nextOnboardingStatus = await window.doon.resetOnboarding();
+    setOnboardingStatus(nextOnboardingStatus);
+  };
+
+  if (onboardingStatus === undefined) {
+    return (
+      <main className="onboarding-shell">
+        <section className="onboarding-panel glass-panel" aria-label="Doon loading">
+          <p className="eyebrow">Doon</p>
+          <h1>작업 범위를 확인하는 중</h1>
+        </section>
+      </main>
+    );
+  }
+
+  if (!onboardingStatus.scopeConfirmed) {
+    return <OnboardingPanel onConfirm={completeOnboarding} />;
+  }
 
   const createTask = async () => {
     const nextTask = await window.doon.createTask({
@@ -96,9 +125,9 @@ export const App = () => {
 
         <div className="context-row">
           <span>Discord - 학생회 · 현재 채널 · 학생회 문서 폴더</span>
-          <button type="button" className="ghost-button">
-            범위 보기
-            <ChevronDown size={14} aria-hidden="true" />
+          <button type="button" className="ghost-button" onClick={resetOnboarding}>
+            범위 초기화
+            <RotateCcw size={14} aria-hidden="true" />
           </button>
         </div>
 

@@ -84,6 +84,13 @@ textarea:focus-visible {
   padding: 48px;
 }
 
+.onboarding-shell {
+  display: grid;
+  min-height: 100vh;
+  padding: 48px;
+  place-items: center;
+}
+
 .glass-panel {
   position: relative;
   overflow: hidden;
@@ -121,6 +128,64 @@ textarea:focus-visible {
 .palette {
   align-self: start;
   padding: 24px;
+}
+
+.onboarding-panel {
+  display: grid;
+  width: min(560px, 100%);
+  gap: 24px;
+  padding: 28px;
+}
+
+.onboarding-hero p:not(.eyebrow) {
+  margin: 12px 0 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 23px;
+}
+
+.scope-list {
+  display: grid;
+  gap: 10px;
+}
+
+.scope-row {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.scope-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  color: var(--action-ink, var(--on-action));
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--glass-warm);
+}
+
+.scope-row strong {
+  display: block;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.scope-row p {
+  margin: 3px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.onboarding-action {
+  justify-self: start;
 }
 
 .palette-header,
