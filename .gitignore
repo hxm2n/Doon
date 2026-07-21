@@ -1,3 +1,10 @@
-.DS_Store
-.omx/
+node_modules/
+.vite/
+src/renderer/.vite/
+out/
+dist/
+coverage/
 .codegraph
+.omx/
+.DS_Store
+*.log
