@@ -21,6 +21,7 @@ import {
 } from "../shared/task-model";
 import { captureWindowInputSchema } from "../shared/window-capture-model";
 import { focusTargetAppInputSchema } from "../shared/window-discovery-model";
+import { buildChromeSessionPolicyDiagnostic } from "./execution-policy-diagnostic";
 import { proposeGeminiAction } from "./gemini-action-provider";
 import {
   captureWindowSnapshot,
@@ -125,6 +126,11 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:launch-chrome-session", (_event, payload: unknown) => {
     const input = chromeSessionInputSchema.parse(payload);
     return launchChromeSessionSnapshot(input);
+  });
+
+  ipcMain.handle("doon:run-policy-diagnostic", async (_event, payload: unknown) => {
+    const input = chromeSessionInputSchema.parse(payload);
+    return buildChromeSessionPolicyDiagnostic(await readChromeSessionSnapshot(input));
   });
 
   ipcMain.handle("doon:propose-action", (_event, payload: unknown) => {

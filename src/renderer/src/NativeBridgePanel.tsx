@@ -1,10 +1,22 @@
-import { AppWindow, Camera, Database, Globe, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
+import {
+  AppWindow,
+  Camera,
+  Database,
+  Globe,
+  ListTree,
+  RefreshCcw,
+  ScanSearch,
+  ShieldCheck,
+} from "lucide-react";
 import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
 import type { ActionProposal } from "../../shared/action-proposal-model";
 import type { ChromeSessionSnapshot } from "../../shared/chrome-session-model";
+import type { ExecutionPolicyDiagnosticSnapshot } from "../../shared/execution-policy-diagnostic-model";
 import type { PersistenceDiagnosticSnapshot } from "../../shared/persistence-diagnostic-model";
 import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
+import { ChromeSessionSummary } from "./ChromeSessionSummary";
+import { PolicyDiagnosticSummary } from "./PolicyDiagnosticSummary";
 
 const stateLabels: Record<WindowDiscoverySnapshot["targets"][number]["state"], string> = {
   focused: "전면",
@@ -37,14 +49,6 @@ const proposalStatusLabels: Record<ActionProposal["status"], string> = {
   provider_error: "호출 실패",
 };
 
-const chromeSessionStatusLabels: Record<ChromeSessionSnapshot["status"], string> = {
-  chrome_not_running: "Chrome 대기",
-  window_not_found: "세션 창 없음",
-  window_found: "세션 창 확인",
-  launch_requested: "실행 요청됨",
-  helper_unavailable: "확인 불가",
-};
-
 const persistenceDiagnosticStatusLabels: Record<PersistenceDiagnosticSnapshot["status"], string> = {
   ready: "SQLite 준비됨",
   failed: "SQLite 실패",
@@ -56,6 +60,7 @@ type NativeBridgePanelProps = {
   readonly captureSnapshot: WindowCaptureSnapshot | undefined;
   readonly actionProposal: ActionProposal | undefined;
   readonly chromeSessionSnapshot: ChromeSessionSnapshot | undefined;
+  readonly policyDiagnostic: ExecutionPolicyDiagnosticSnapshot | undefined;
   readonly persistenceDiagnostic: PersistenceDiagnosticSnapshot | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
@@ -63,6 +68,7 @@ type NativeBridgePanelProps = {
   readonly onCaptureWindow: (targetId: TargetAppId) => Promise<void>;
   readonly onReadChromeSession: () => Promise<void>;
   readonly onLaunchChromeSession: () => Promise<void>;
+  readonly onRunPolicyDiagnostic: () => Promise<void>;
   readonly onRunPersistenceDiagnostic: () => Promise<void>;
   readonly onProposeAction: () => Promise<void>;
 };
@@ -73,6 +79,7 @@ export const NativeBridgePanel = ({
   captureSnapshot,
   actionProposal,
   chromeSessionSnapshot,
+  policyDiagnostic,
   persistenceDiagnostic,
   onRefresh,
   onFocusTarget,
@@ -80,6 +87,7 @@ export const NativeBridgePanel = ({
   onCaptureWindow,
   onReadChromeSession,
   onLaunchChromeSession,
+  onRunPolicyDiagnostic,
   onRunPersistenceDiagnostic,
   onProposeAction,
 }: NativeBridgePanelProps) => (
@@ -126,6 +134,14 @@ export const NativeBridgePanel = ({
       >
         <Database size={15} aria-hidden="true" />
         SQLite 진단
+      </button>
+      <button
+        type="button"
+        className="secondary-button target-action"
+        onClick={onRunPolicyDiagnostic}
+      >
+        <ShieldCheck size={15} aria-hidden="true" />
+        정책 진단
       </button>
     </div>
 
@@ -217,13 +233,11 @@ export const NativeBridgePanel = ({
     ) : null}
 
     {chromeSessionSnapshot !== undefined ? (
-      <article className="chrome-session-summary">
-        <div className="chrome-session-summary-header">
-          <strong>{chromeSessionStatusLabels[chromeSessionSnapshot.status]}</strong>
-          <span>{chromeSessionSnapshot.sessionId}</span>
-        </div>
-        <p>{chromeSessionSnapshot.windowTitle || chromeSessionSnapshot.markerTitle}</p>
-      </article>
+      <ChromeSessionSummary chromeSessionSnapshot={chromeSessionSnapshot} />
+    ) : null}
+
+    {policyDiagnostic !== undefined ? (
+      <PolicyDiagnosticSummary policyDiagnostic={policyDiagnostic} />
     ) : null}
 
     {persistenceDiagnostic !== undefined ? (

@@ -18,6 +18,10 @@ import {
   chromeSessionInputSchema,
   chromeSessionSnapshotSchema,
 } from "../shared/chrome-session-model";
+import {
+  type ExecutionPolicyDiagnosticSnapshot,
+  executionPolicyDiagnosticSnapshotSchema,
+} from "../shared/execution-policy-diagnostic-model";
 import { type OnboardingStatus, onboardingStatusSchema } from "../shared/onboarding-model";
 import {
   type OpenSystemPermissionSettingsInput,
@@ -72,6 +76,9 @@ export type DoonApi = {
   readonly captureWindow: (input: CaptureWindowInput) => Promise<WindowCaptureSnapshot>;
   readonly readChromeSession: (input: ChromeSessionInput) => Promise<ChromeSessionSnapshot>;
   readonly launchChromeSession: (input: ChromeSessionInput) => Promise<ChromeSessionSnapshot>;
+  readonly runPolicyDiagnostic: (
+    input: ChromeSessionInput,
+  ) => Promise<ExecutionPolicyDiagnosticSnapshot>;
   readonly proposeAction: (input: ProposeActionInput) => Promise<ActionProposal>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
@@ -148,6 +155,10 @@ const doonApi: DoonApi = {
   launchChromeSession: async (input) =>
     chromeSessionSnapshotSchema.parse(
       await ipcRenderer.invoke("doon:launch-chrome-session", chromeSessionInputSchema.parse(input)),
+    ),
+  runPolicyDiagnostic: async (input) =>
+    executionPolicyDiagnosticSnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:run-policy-diagnostic", chromeSessionInputSchema.parse(input)),
     ),
   proposeAction: async (input) =>
     actionProposalSchema.parse(

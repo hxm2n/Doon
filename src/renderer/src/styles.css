@@ -480,6 +480,7 @@ textarea:focus-visible {
 .window-capture-summary,
 .action-proposal-summary,
 .chrome-session-summary,
+.policy-diagnostic-summary,
 .persistence-diagnostic-summary {
   display: grid;
   gap: 6px;
@@ -495,6 +496,7 @@ textarea:focus-visible {
 .window-capture-summary-header,
 .action-proposal-summary-header,
 .chrome-session-summary-header,
+.policy-diagnostic-summary-header,
 .persistence-diagnostic-summary-header {
   display: flex;
   justify-content: space-between;
@@ -505,6 +507,7 @@ textarea:focus-visible {
 .window-capture-summary span,
 .action-proposal-summary span,
 .chrome-session-summary span,
+.policy-diagnostic-summary span,
 .persistence-diagnostic-summary span {
   color: var(--text-secondary);
   font-size: 0.82rem;
@@ -515,6 +518,7 @@ textarea:focus-visible {
 .window-capture-summary p,
 .action-proposal-summary p,
 .chrome-session-summary p,
+.policy-diagnostic-summary p,
 .persistence-diagnostic-summary p {
   margin: 0;
   color: var(--text-tertiary);
