@@ -5,6 +5,7 @@ import {
   type ChromeSessionSnapshot,
   createChromeSessionId,
 } from "../../shared/chrome-session-model";
+import type { PersistenceDiagnosticSnapshot } from "../../shared/persistence-diagnostic-model";
 import type { StageId } from "../../shared/task-model";
 import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
@@ -17,12 +18,14 @@ export type NativeBridgeState = {
   readonly captureSnapshot: WindowCaptureSnapshot | undefined;
   readonly actionProposal: ActionProposal | undefined;
   readonly chromeSessionSnapshot: ChromeSessionSnapshot | undefined;
+  readonly persistenceDiagnostic: PersistenceDiagnosticSnapshot | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
   readonly onReadAccessibilityTree: (targetId: TargetAppId) => Promise<void>;
   readonly onCaptureWindow: (targetId: TargetAppId) => Promise<void>;
   readonly onReadChromeSession: () => Promise<void>;
   readonly onLaunchChromeSession: () => Promise<void>;
+  readonly onRunPersistenceDiagnostic: () => Promise<void>;
   readonly proposeAction: (command: string, stageId: StageId) => Promise<void>;
 };
 
@@ -37,6 +40,9 @@ export const useNativeBridgeState = (): NativeBridgeState => {
   const [actionProposal, setActionProposal] = useState<ActionProposal | undefined>(undefined);
   const [chromeSessionSnapshot, setChromeSessionSnapshot] = useState<
     ChromeSessionSnapshot | undefined
+  >(undefined);
+  const [persistenceDiagnostic, setPersistenceDiagnostic] = useState<
+    PersistenceDiagnosticSnapshot | undefined
   >(undefined);
 
   useEffect(() => {
@@ -79,6 +85,10 @@ export const useNativeBridgeState = (): NativeBridgeState => {
     );
   };
 
+  const runPersistenceDiagnostic = async () => {
+    setPersistenceDiagnostic(await window.doon.runPersistenceDiagnostic());
+  };
+
   const proposeAction = async (command: string, stageId: StageId) => {
     setActionProposal(
       await window.doon.proposeAction({
@@ -96,12 +106,14 @@ export const useNativeBridgeState = (): NativeBridgeState => {
     captureSnapshot,
     actionProposal,
     chromeSessionSnapshot,
+    persistenceDiagnostic,
     onRefresh: refreshWindowDiscovery,
     onFocusTarget: focusTargetApp,
     onReadAccessibilityTree: readAccessibilityTree,
     onCaptureWindow: captureWindow,
     onReadChromeSession: readChromeSession,
     onLaunchChromeSession: launchChromeSession,
+    onRunPersistenceDiagnostic: runPersistenceDiagnostic,
     proposeAction,
   };
 };

@@ -25,6 +25,10 @@ import {
   type SystemPermissionSnapshot,
   systemPermissionSnapshotSchema,
 } from "../shared/permission-model";
+import {
+  type PersistenceDiagnosticSnapshot,
+  persistenceDiagnosticSnapshotSchema,
+} from "../shared/persistence-diagnostic-model";
 import type {
   CreateTaskInput,
   RevisionInput,
@@ -55,6 +59,7 @@ export type DoonApi = {
   readonly getOnboardingStatus: () => Promise<OnboardingStatus>;
   readonly completeOnboarding: () => Promise<OnboardingStatus>;
   readonly resetOnboarding: () => Promise<OnboardingStatus>;
+  readonly runPersistenceDiagnostic: () => Promise<PersistenceDiagnosticSnapshot>;
   readonly getSystemPermissionSnapshot: () => Promise<SystemPermissionSnapshot>;
   readonly openSystemPermissionSettings: (
     input: OpenSystemPermissionSettingsInput,
@@ -103,6 +108,10 @@ const doonApi: DoonApi = {
     onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:complete-onboarding")),
   resetOnboarding: async () =>
     onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:reset-onboarding")),
+  runPersistenceDiagnostic: async () =>
+    persistenceDiagnosticSnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:run-persistence-diagnostic"),
+    ),
   getSystemPermissionSnapshot: async () =>
     systemPermissionSnapshotSchema.parse(
       await ipcRenderer.invoke("doon:get-system-permission-snapshot"),

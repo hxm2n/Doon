@@ -90,4 +90,17 @@ describe("task repository", () => {
 
     expect(restoredStatus).toEqual(defaultOnboardingStatus);
   });
+
+  it("runs a SQLite persistence diagnostic without storing user content", () => {
+    const repository = new TaskRepository(createTempDatabasePath());
+    const diagnostic = repository.runPersistenceDiagnostic();
+    repository.close();
+
+    expect(diagnostic.status).toBe("ready");
+    expect(diagnostic.journalMode).toBe("wal");
+    expect(diagnostic.secureDelete).toBe(true);
+    expect(diagnostic.smokeKey).toBe("sqlite_smoke");
+    expect(diagnostic.taskCount).toBe(0);
+    expect(diagnostic.settingCount).toBe(0);
+  });
 });

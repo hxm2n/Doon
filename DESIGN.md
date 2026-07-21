@@ -333,7 +333,7 @@ Implementation rules:
 | `.command-input` / `.revision-input` | Inset glass field with opaque text backing and focus rim | Do not make typed text sit on a busy transparent field |
 | `.scope-row` | Onboarding scope row with subdued liquid lens treatment | Should look trustworthy, not like a marketing card |
 | `.permission-panel` / `.permission-row` | Onboarding permission status surface with compact readable rows and state labels | Required permissions are product safety information, so clarity wins over decoration |
-| `.bridge-panel` / `.target-card` / `.accessibility-summary` / `.window-capture-summary` / `.action-proposal-summary` / `.chrome-session-summary` | Developer-facing native spike surface using the same glass shell, compact target rows, and concise AX/capture/AI proposal/Chrome session result summaries | Status data must be scannable; do not turn diagnostics into decorative cards |
+| `.bridge-panel` / `.target-card` / `.accessibility-summary` / `.window-capture-summary` / `.action-proposal-summary` / `.chrome-session-summary` / `.persistence-diagnostic-summary` | Developer-facing native spike surface using the same glass shell, compact target rows, and concise AX/capture/AI proposal/Chrome session/SQLite result summaries | Status data must be scannable; do not turn diagnostics into decorative cards |
 
 Surface mapping:
 
