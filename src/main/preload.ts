@@ -6,6 +6,12 @@ import {
   type ReadAccessibilityTreeInput,
   readAccessibilityTreeInputSchema,
 } from "../shared/accessibility-tree-model";
+import {
+  type ActionProposal,
+  actionProposalSchema,
+  type ProposeActionInput,
+  proposeActionInputSchema,
+} from "../shared/action-proposal-model";
 import { type OnboardingStatus, onboardingStatusSchema } from "../shared/onboarding-model";
 import {
   type OpenSystemPermissionSettingsInput,
@@ -53,6 +59,7 @@ export type DoonApi = {
     input: ReadAccessibilityTreeInput,
   ) => Promise<AccessibilityTreeSnapshot>;
   readonly captureWindow: (input: CaptureWindowInput) => Promise<WindowCaptureSnapshot>;
+  readonly proposeAction: (input: ProposeActionInput) => Promise<ActionProposal>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -116,6 +123,10 @@ const doonApi: DoonApi = {
   captureWindow: async (input) =>
     windowCaptureSnapshotSchema.parse(
       await ipcRenderer.invoke("doon:capture-window", captureWindowInputSchema.parse(input)),
+    ),
+  proposeAction: async (input) =>
+    actionProposalSchema.parse(
+      await ipcRenderer.invoke("doon:propose-action", proposeActionInputSchema.parse(input)),
     ),
   getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),
