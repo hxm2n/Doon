@@ -14,6 +14,12 @@ import type {
   TaskSnapshot,
 } from "../shared/task-model";
 import { parseOptionalTaskSnapshot } from "../shared/task-snapshot-parser";
+import {
+  type FocusTargetAppInput,
+  focusTargetAppInputSchema,
+  type WindowDiscoverySnapshot,
+  windowDiscoverySnapshotSchema,
+} from "../shared/window-discovery-model";
 
 export type DoonAppInfo = {
   readonly name: string;
@@ -29,6 +35,8 @@ export type DoonApi = {
   readonly openSystemPermissionSettings: (
     input: OpenSystemPermissionSettingsInput,
   ) => Promise<void>;
+  readonly getWindowDiscoverySnapshot: () => Promise<WindowDiscoverySnapshot>;
+  readonly focusTargetApp: (input: FocusTargetAppInput) => Promise<WindowDiscoverySnapshot>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -74,6 +82,14 @@ const doonApi: DoonApi = {
       openSystemPermissionSettingsInputSchema.parse(input),
     );
   },
+  getWindowDiscoverySnapshot: async () =>
+    windowDiscoverySnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:get-window-discovery-snapshot"),
+    ),
+  focusTargetApp: async (input) =>
+    windowDiscoverySnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:focus-target-app", focusTargetAppInputSchema.parse(input)),
+    ),
   getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),
   startStage: (input) => invokeTask("doon:start-stage", input),

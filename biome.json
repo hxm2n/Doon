@@ -9,6 +9,7 @@
       "!src/renderer/.vite",
       "!coverage",
       "!dist",
+      "!native",
       "!node_modules",
       "!out"
     ]

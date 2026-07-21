@@ -16,6 +16,8 @@ import {
   stageActionInputSchema,
   type TaskSnapshot,
 } from "../shared/task-model";
+import { focusTargetAppInputSchema } from "../shared/window-discovery-model";
+import { focusTargetApp, readWindowDiscoverySnapshot } from "./native-window-discovery";
 import { openSystemPermissionSettings, readSystemPermissionSnapshot } from "./system-permissions";
 import { TaskRepository } from "./task-repository";
 
@@ -82,6 +84,13 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:open-system-permission-settings", (_event, payload: unknown) => {
     const input = openSystemPermissionSettingsInputSchema.parse(payload);
     return openSystemPermissionSettings(input.permissionId);
+  });
+
+  ipcMain.handle("doon:get-window-discovery-snapshot", () => readWindowDiscoverySnapshot());
+
+  ipcMain.handle("doon:focus-target-app", (_event, payload: unknown) => {
+    const input = focusTargetAppInputSchema.parse(payload);
+    return focusTargetApp(input);
   });
 
   ipcMain.handle("doon:complete-onboarding", () => {

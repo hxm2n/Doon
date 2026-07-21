@@ -8,3 +8,4 @@ coverage/
 .omx/
 .DS_Store
 *.log
+native/macos-helper/DoonHelper

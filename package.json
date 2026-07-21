@@ -5,12 +5,17 @@
   "description": "Doon은 사용자의 컴퓨터 화면에서 작업 과정을 보여주고, 단계별 승인을 받으며 귀찮은 디지털 작업을 실제로 끝내는 개인용 AI 컴퓨터 오퍼레이터입니다.",
   "main": ".vite/build/main.js",
   "scripts": {
+    "build:native:macos": "swiftc native/macos-helper/DoonHelper.swift -o native/macos-helper/DoonHelper",
+    "prestart": "npm run build:native:macos",
     "start": "electron-forge start",
+    "prepackage": "npm run build:native:macos",
     "package": "electron-forge package",
+    "premake": "npm run build:native:macos",
     "make": "electron-forge make",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "test": "ELECTRON_RUN_AS_NODE=1 electron ./node_modules/vitest/vitest.mjs run",
+    "prebuild": "npm run build:native:macos",
     "build": "electron-forge package"
   },
   "keywords": [],

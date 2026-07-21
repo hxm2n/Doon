@@ -154,7 +154,9 @@ textarea:focus-visible {
 .stage-row > *,
 .scope-row > *,
 .permission-panel > *,
-.permission-row > * {
+.permission-row > *,
+.bridge-panel > *,
+.target-card > * {
   position: relative;
   z-index: 1;
 }
@@ -167,6 +169,7 @@ textarea:focus-visible {
 }
 
 .palette {
+  grid-column: 1;
   align-self: start;
   padding: 24px;
 }
@@ -363,6 +366,108 @@ textarea:focus-visible {
 .permission-row[data-state="denied"] .permission-action span,
 .permission-row[data-state="restricted"] .permission-action span {
   color: var(--danger);
+}
+
+.bridge-panel {
+  grid-column: 1;
+  display: grid;
+  gap: 16px;
+  align-self: start;
+  padding: 20px;
+}
+
+.bridge-heading,
+.target-title,
+.target-card dl div {
+  display: flex;
+  align-items: center;
+}
+
+.bridge-heading {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bridge-title {
+  margin: 4px 0 0;
+  font-size: 1.15rem;
+  letter-spacing: 0;
+}
+
+.bridge-warning {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.target-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.target-card {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, var(--liquid-readability), transparent),
+    color-mix(in srgb, var(--surface) 76%, transparent);
+  box-shadow:
+    0 1px 0 var(--border-highlight) inset,
+    0 -1px 0 var(--border-shade) inset;
+}
+
+.target-card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 38%;
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(180deg, var(--liquid-highlight), transparent);
+  opacity: 0.38;
+}
+
+.target-title {
+  min-width: 0;
+  gap: 8px;
+}
+
+.target-title strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.target-card dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.target-card dl div {
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.target-card dt {
+  color: var(--text-tertiary);
+  font-size: 0.78rem;
+}
+
+.target-card dd {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.target-action {
+  width: 100%;
 }
 
 .palette-header,
@@ -589,6 +694,8 @@ h2 {
 }
 
 .workspace {
+  grid-column: 2;
+  grid-row: 1 / span 2;
   display: grid;
   gap: 16px;
   align-content: start;
@@ -739,6 +846,7 @@ h2 {
   .scope-row,
   .permission-panel,
   .permission-row,
+  .target-card,
   .command-input,
   .revision-input,
   .secondary-button,
@@ -755,12 +863,25 @@ h2 {
   .stage-row::before,
   .scope-row::before,
   .permission-panel::before,
-  .permission-row::before {
+  .permission-row::before,
+  .target-card::before {
     display: none;
   }
 }
 
 @media (max-width: 720px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+    padding: 28px;
+  }
+
+  .palette,
+  .bridge-panel,
+  .workspace {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
   .permission-row {
     grid-template-columns: 1fr;
   }
@@ -771,6 +892,10 @@ h2 {
 
   .permission-action span {
     text-align: left;
+  }
+
+  .target-grid {
+    grid-template-columns: 1fr;
   }
 }
 
