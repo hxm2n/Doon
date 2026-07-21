@@ -12,6 +12,12 @@ import {
   type ProposeActionInput,
   proposeActionInputSchema,
 } from "../shared/action-proposal-model";
+import {
+  type ChromeSessionInput,
+  type ChromeSessionSnapshot,
+  chromeSessionInputSchema,
+  chromeSessionSnapshotSchema,
+} from "../shared/chrome-session-model";
 import { type OnboardingStatus, onboardingStatusSchema } from "../shared/onboarding-model";
 import {
   type OpenSystemPermissionSettingsInput,
@@ -59,6 +65,8 @@ export type DoonApi = {
     input: ReadAccessibilityTreeInput,
   ) => Promise<AccessibilityTreeSnapshot>;
   readonly captureWindow: (input: CaptureWindowInput) => Promise<WindowCaptureSnapshot>;
+  readonly readChromeSession: (input: ChromeSessionInput) => Promise<ChromeSessionSnapshot>;
+  readonly launchChromeSession: (input: ChromeSessionInput) => Promise<ChromeSessionSnapshot>;
   readonly proposeAction: (input: ProposeActionInput) => Promise<ActionProposal>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
@@ -123,6 +131,14 @@ const doonApi: DoonApi = {
   captureWindow: async (input) =>
     windowCaptureSnapshotSchema.parse(
       await ipcRenderer.invoke("doon:capture-window", captureWindowInputSchema.parse(input)),
+    ),
+  readChromeSession: async (input) =>
+    chromeSessionSnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:read-chrome-session", chromeSessionInputSchema.parse(input)),
+    ),
+  launchChromeSession: async (input) =>
+    chromeSessionSnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:launch-chrome-session", chromeSessionInputSchema.parse(input)),
     ),
   proposeAction: async (input) =>
     actionProposalSchema.parse(

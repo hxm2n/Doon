@@ -1,6 +1,7 @@
-import { AppWindow, Camera, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
+import { AppWindow, Camera, Globe, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
 import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
 import type { ActionProposal } from "../../shared/action-proposal-model";
+import type { ChromeSessionSnapshot } from "../../shared/chrome-session-model";
 import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 
@@ -35,15 +36,26 @@ const proposalStatusLabels: Record<ActionProposal["status"], string> = {
   provider_error: "호출 실패",
 };
 
+const chromeSessionStatusLabels: Record<ChromeSessionSnapshot["status"], string> = {
+  chrome_not_running: "Chrome 대기",
+  window_not_found: "세션 창 없음",
+  window_found: "세션 창 확인",
+  launch_requested: "실행 요청됨",
+  helper_unavailable: "확인 불가",
+};
+
 type NativeBridgePanelProps = {
   readonly snapshot: WindowDiscoverySnapshot | undefined;
   readonly accessibilitySnapshot: AccessibilityTreeSnapshot | undefined;
   readonly captureSnapshot: WindowCaptureSnapshot | undefined;
   readonly actionProposal: ActionProposal | undefined;
+  readonly chromeSessionSnapshot: ChromeSessionSnapshot | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
   readonly onReadAccessibilityTree: (targetId: TargetAppId) => Promise<void>;
   readonly onCaptureWindow: (targetId: TargetAppId) => Promise<void>;
+  readonly onReadChromeSession: () => Promise<void>;
+  readonly onLaunchChromeSession: () => Promise<void>;
   readonly onProposeAction: () => Promise<void>;
 };
 
@@ -52,10 +64,13 @@ export const NativeBridgePanel = ({
   accessibilitySnapshot,
   captureSnapshot,
   actionProposal,
+  chromeSessionSnapshot,
   onRefresh,
   onFocusTarget,
   onReadAccessibilityTree,
   onCaptureWindow,
+  onReadChromeSession,
+  onLaunchChromeSession,
   onProposeAction,
 }: NativeBridgePanelProps) => (
   <section className="bridge-panel glass-panel" aria-label="Native helper window discovery">
@@ -77,6 +92,24 @@ export const NativeBridgePanel = ({
       <ScanSearch size={15} aria-hidden="true" />
       AI 행동 제안
     </button>
+    <div className="bridge-action-grid">
+      <button
+        type="button"
+        className="secondary-button target-action"
+        onClick={onReadChromeSession}
+      >
+        <Globe size={15} aria-hidden="true" />
+        Chrome 세션 확인
+      </button>
+      <button
+        type="button"
+        className="secondary-button target-action"
+        onClick={onLaunchChromeSession}
+      >
+        <Globe size={15} aria-hidden="true" />
+        테스트 창 열기
+      </button>
+    </div>
 
     {snapshot?.errorMessage !== undefined ? (
       <p className="bridge-warning">{snapshot.errorMessage}</p>
@@ -162,6 +195,16 @@ export const NativeBridgePanel = ({
           <span>{actionProposal.action?.type ?? "no_action"}</span>
         </div>
         <p>{actionProposal.reason}</p>
+      </article>
+    ) : null}
+
+    {chromeSessionSnapshot !== undefined ? (
+      <article className="chrome-session-summary">
+        <div className="chrome-session-summary-header">
+          <strong>{chromeSessionStatusLabels[chromeSessionSnapshot.status]}</strong>
+          <span>{chromeSessionSnapshot.sessionId}</span>
+        </div>
+        <p>{chromeSessionSnapshot.windowTitle || chromeSessionSnapshot.markerTitle}</p>
       </article>
     ) : null}
   </section>

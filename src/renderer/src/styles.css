@@ -407,6 +407,12 @@ textarea:focus-visible {
   gap: 12px;
 }
 
+.bridge-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
 .target-card {
   position: relative;
   overflow: hidden;
@@ -472,7 +478,8 @@ textarea:focus-visible {
 
 .accessibility-summary,
 .window-capture-summary,
-.action-proposal-summary {
+.action-proposal-summary,
+.chrome-session-summary {
   display: grid;
   gap: 6px;
   padding: 12px 14px;
@@ -485,7 +492,8 @@ textarea:focus-visible {
 
 .accessibility-summary-header,
 .window-capture-summary-header,
-.action-proposal-summary-header {
+.action-proposal-summary-header,
+.chrome-session-summary-header {
   display: flex;
   justify-content: space-between;
   gap: 12px;
@@ -493,7 +501,8 @@ textarea:focus-visible {
 
 .accessibility-summary span,
 .window-capture-summary span,
-.action-proposal-summary span {
+.action-proposal-summary span,
+.chrome-session-summary span {
   color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 700;
@@ -501,7 +510,8 @@ textarea:focus-visible {
 
 .accessibility-summary p,
 .window-capture-summary p,
-.action-proposal-summary p {
+.action-proposal-summary p,
+.chrome-session-summary p {
   margin: 0;
   color: var(--text-tertiary);
   font-size: 0.82rem;

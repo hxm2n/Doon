@@ -2,6 +2,7 @@ import path from "node:path";
 import { app, BrowserWindow, globalShortcut, ipcMain } from "electron";
 import { readAccessibilityTreeInputSchema } from "../shared/accessibility-tree-model";
 import { proposeActionInputSchema } from "../shared/action-proposal-model";
+import { chromeSessionInputSchema } from "../shared/chrome-session-model";
 import { completeOnboardingStatus, resetOnboardingStatus } from "../shared/onboarding-model";
 import { openSystemPermissionSettingsInputSchema } from "../shared/permission-model";
 import {
@@ -24,7 +25,9 @@ import { proposeGeminiAction } from "./gemini-action-provider";
 import {
   captureWindowSnapshot,
   focusTargetApp,
+  launchChromeSessionSnapshot,
   readAccessibilityTreeSnapshot,
+  readChromeSessionSnapshot,
   readWindowDiscoverySnapshot,
 } from "./native-window-discovery";
 import { openSystemPermissionSettings, readSystemPermissionSnapshot } from "./system-permissions";
@@ -110,6 +113,16 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:capture-window", (_event, payload: unknown) => {
     const input = captureWindowInputSchema.parse(payload);
     return captureWindowSnapshot(input);
+  });
+
+  ipcMain.handle("doon:read-chrome-session", (_event, payload: unknown) => {
+    const input = chromeSessionInputSchema.parse(payload);
+    return readChromeSessionSnapshot(input);
+  });
+
+  ipcMain.handle("doon:launch-chrome-session", (_event, payload: unknown) => {
+    const input = chromeSessionInputSchema.parse(payload);
+    return launchChromeSessionSnapshot(input);
   });
 
   ipcMain.handle("doon:propose-action", (_event, payload: unknown) => {

@@ -70,8 +70,21 @@ struct WindowCapturePayload: Codable {
   let errorMessage: String?
 }
 
+struct ChromeSessionPayload: Codable {
+  let platform: String
+  let checkedAt: String
+  let sessionId: String
+  let status: String
+  let launchUrl: String
+  let markerTitle: String
+  let windowTitle: String
+  let windowBounds: WindowBounds?
+  let errorMessage: String?
+}
+
 enum HelperError: Error, CustomStringConvertible {
   case invalidCommand
+  case invalidSessionId(String)
   case unknownTarget(String)
   case appNotFound(String)
   case launchFailed(String)
@@ -79,7 +92,9 @@ enum HelperError: Error, CustomStringConvertible {
   var description: String {
     switch self {
     case .invalidCommand:
-      return "Usage: DoonHelper list_windows | focus_app <target-id> | read_ax_tree <target-id> | capture_window <target-id>"
+      return "Usage: DoonHelper list_windows | focus_app <target-id> | read_ax_tree <target-id> | capture_window <target-id> | read_chrome_session <session-id> | launch_chrome_session <session-id>"
+    case .invalidSessionId(let sessionId):
+      return "Invalid session id: \(sessionId)"
     case .unknownTarget(let targetId):
       return "Unknown target app: \(targetId)"
     case .appNotFound(let bundleId):

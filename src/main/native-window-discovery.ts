@@ -10,6 +10,12 @@ import {
   type ReadAccessibilityTreeInput,
 } from "../shared/accessibility-tree-model";
 import {
+  type ChromeSessionInput,
+  type ChromeSessionSnapshot,
+  createUnavailableChromeSessionSnapshot,
+  nativeChromeSessionPayloadSchema,
+} from "../shared/chrome-session-model";
+import {
   type CaptureWindowInput,
   createUnavailableWindowCaptureSnapshot,
   nativeWindowCapturePayloadSchema,
@@ -123,3 +129,37 @@ export const captureWindowSnapshot = async (
     helperAvailable: true,
   };
 };
+
+const parseChromeSessionSnapshot = (
+  input: ChromeSessionInput,
+  result: HelperRunResult,
+): ChromeSessionSnapshot => {
+  if (result.kind === "unavailable") {
+    return createUnavailableChromeSessionSnapshot(
+      input.sessionId,
+      result.message,
+      currentTimestamp(),
+      process.platform,
+    );
+  }
+  return {
+    ...nativeChromeSessionPayloadSchema.parse(JSON.parse(result.stdout)),
+    helperAvailable: true,
+  };
+};
+
+export const readChromeSessionSnapshot = async (
+  input: ChromeSessionInput,
+): Promise<ChromeSessionSnapshot> =>
+  parseChromeSessionSnapshot(
+    input,
+    await readHelperOutput(["read_chrome_session", input.sessionId]),
+  );
+
+export const launchChromeSessionSnapshot = async (
+  input: ChromeSessionInput,
+): Promise<ChromeSessionSnapshot> =>
+  parseChromeSessionSnapshot(
+    input,
+    await readHelperOutput(["launch_chrome_session", input.sessionId]),
+  );
