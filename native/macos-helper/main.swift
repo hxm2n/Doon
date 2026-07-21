@@ -21,6 +21,16 @@ func run(arguments: [String]) throws {
       throw HelperError.invalidCommand
     }
     try printJson(captureWindow(targetId: arguments[2]))
+  case "read_chrome_session":
+    guard arguments.count == 3 else {
+      throw HelperError.invalidCommand
+    }
+    try printJson(try readChromeSession(sessionId: arguments[2]))
+  case "launch_chrome_session":
+    guard arguments.count == 3 else {
+      throw HelperError.invalidCommand
+    }
+    try printJson(launchChromeSession(sessionId: arguments[2]))
   default:
     throw HelperError.invalidCommand
   }

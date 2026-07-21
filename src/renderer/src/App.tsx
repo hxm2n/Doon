@@ -1,35 +1,23 @@
 import { CircleStop, Play, RotateCcw, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
-import type { ActionProposal } from "../../shared/action-proposal-model";
 import type { OnboardingStatus } from "../../shared/onboarding-model";
 import type { SystemPermissionId, SystemPermissionSnapshot } from "../../shared/permission-model";
 import type { StageId, TaskSnapshot } from "../../shared/task-model";
-import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
-import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 import { NativeBridgePanel } from "./NativeBridgePanel";
 import { OnboardingPanel } from "./OnboardingPanel";
 import { TaskWorkspace } from "./TaskWorkspace";
+import { useNativeBridgeState } from "./useNativeBridgeState";
 
 const defaultCommand =
   "학생회 디스코드에서 행사 계획서 요구사항을 확인하고, 형식에 맞는 한글 문서를 만들어서 학생회 문서 폴더에 저장해줘.";
 
 export const App = () => {
   const [command, setCommand] = useState(defaultCommand);
+  const nativeBridge = useNativeBridgeState();
   const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatus | undefined>(undefined);
   const [permissionSnapshot, setPermissionSnapshot] = useState<
     SystemPermissionSnapshot | undefined
   >(undefined);
-  const [windowDiscoverySnapshot, setWindowDiscoverySnapshot] = useState<
-    WindowDiscoverySnapshot | undefined
-  >(undefined);
-  const [accessibilityTreeSnapshot, setAccessibilityTreeSnapshot] = useState<
-    AccessibilityTreeSnapshot | undefined
-  >(undefined);
-  const [windowCaptureSnapshot, setWindowCaptureSnapshot] = useState<
-    WindowCaptureSnapshot | undefined
-  >(undefined);
-  const [actionProposal, setActionProposal] = useState<ActionProposal | undefined>(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
 
@@ -38,23 +26,14 @@ export const App = () => {
     Promise.all([
       window.doon.getOnboardingStatus(),
       window.doon.getSystemPermissionSnapshot(),
-      window.doon.getWindowDiscoverySnapshot(),
       window.doon.getCurrentTask(),
-    ]).then(
-      ([
-        savedOnboardingStatus,
-        savedPermissionSnapshot,
-        savedWindowDiscoverySnapshot,
-        savedTask,
-      ]) => {
-        if (isMounted) {
-          setOnboardingStatus(savedOnboardingStatus);
-          setPermissionSnapshot(savedPermissionSnapshot);
-          setWindowDiscoverySnapshot(savedWindowDiscoverySnapshot);
-          setTask(savedTask);
-        }
-      },
-    );
+    ]).then(([savedOnboardingStatus, savedPermissionSnapshot, savedTask]) => {
+      if (isMounted) {
+        setOnboardingStatus(savedOnboardingStatus);
+        setPermissionSnapshot(savedPermissionSnapshot);
+        setTask(savedTask);
+      }
+    });
 
     return () => {
       isMounted = false;
@@ -77,33 +56,6 @@ export const App = () => {
   const openPermissionSettings = async (permissionId: SystemPermissionId) => {
     await window.doon.openSystemPermissionSettings({ permissionId });
     await refreshPermissions();
-  };
-
-  const refreshWindowDiscovery = async () => {
-    setWindowDiscoverySnapshot(await window.doon.getWindowDiscoverySnapshot());
-  };
-
-  const focusTargetApp = async (targetId: TargetAppId) => {
-    setWindowDiscoverySnapshot(await window.doon.focusTargetApp({ targetId }));
-  };
-
-  const readAccessibilityTree = async (targetId: TargetAppId) => {
-    setAccessibilityTreeSnapshot(await window.doon.readAccessibilityTree({ targetId }));
-  };
-
-  const captureWindow = async (targetId: TargetAppId) => {
-    setWindowCaptureSnapshot(await window.doon.captureWindow({ targetId }));
-  };
-
-  const proposeAction = async () => {
-    setActionProposal(
-      await window.doon.proposeAction({
-        command,
-        stageId: task?.currentStageId ?? "requirements_collected",
-        accessibilitySnapshot: accessibilityTreeSnapshot,
-        captureSnapshot: windowCaptureSnapshot,
-      }),
-    );
   };
 
   if (onboardingStatus === undefined) {
@@ -161,6 +113,7 @@ export const App = () => {
   const pauseTask = async () => setTask(await window.doon.pauseTask());
   const resumeTask = async () => setTask(await window.doon.resumeTask());
   const cancelTask = async () => setTask(await window.doon.cancelTask());
+  const { proposeAction, ...nativeBridgePanel } = nativeBridge;
 
   return (
     <main className="app-shell">
@@ -214,15 +167,10 @@ export const App = () => {
       </section>
 
       <NativeBridgePanel
-        snapshot={windowDiscoverySnapshot}
-        accessibilitySnapshot={accessibilityTreeSnapshot}
-        captureSnapshot={windowCaptureSnapshot}
-        actionProposal={actionProposal}
-        onRefresh={refreshWindowDiscovery}
-        onFocusTarget={focusTargetApp}
-        onReadAccessibilityTree={readAccessibilityTree}
-        onCaptureWindow={captureWindow}
-        onProposeAction={proposeAction}
+        {...nativeBridgePanel}
+        onProposeAction={() =>
+          proposeAction(command, task?.currentStageId ?? "requirements_collected")
+        }
       />
 
       <TaskWorkspace
