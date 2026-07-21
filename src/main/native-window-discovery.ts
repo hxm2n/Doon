@@ -10,6 +10,12 @@ import {
   type ReadAccessibilityTreeInput,
 } from "../shared/accessibility-tree-model";
 import {
+  type CaptureWindowInput,
+  createUnavailableWindowCaptureSnapshot,
+  nativeWindowCapturePayloadSchema,
+  type WindowCaptureSnapshot,
+} from "../shared/window-capture-model";
+import {
   createUnavailableWindowDiscoverySnapshot,
   type FocusTargetAppInput,
   nativeWindowDiscoveryPayloadSchema,
@@ -96,6 +102,24 @@ export const readAccessibilityTreeSnapshot = async (
   }
   return {
     ...nativeAccessibilityTreePayloadSchema.parse(JSON.parse(result.stdout)),
+    helperAvailable: true,
+  };
+};
+
+export const captureWindowSnapshot = async (
+  input: CaptureWindowInput,
+): Promise<WindowCaptureSnapshot> => {
+  const result = await readHelperOutput(["capture_window", input.targetId]);
+  if (result.kind === "unavailable") {
+    return createUnavailableWindowCaptureSnapshot(
+      input.targetId,
+      result.message,
+      currentTimestamp(),
+      process.platform,
+    );
+  }
+  return {
+    ...nativeWindowCapturePayloadSchema.parse(JSON.parse(result.stdout)),
     helperAvailable: true,
   };
 };

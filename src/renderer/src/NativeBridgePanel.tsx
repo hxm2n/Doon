@@ -1,5 +1,6 @@
-import { AppWindow, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
+import { AppWindow, Camera, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
 import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
+import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 
 const stateLabels: Record<WindowDiscoverySnapshot["targets"][number]["state"], string> = {
@@ -17,20 +18,34 @@ const accessibilityStatusLabels: Record<AccessibilityTreeSnapshot["status"], str
   helper_unavailable: "확인 불가",
 };
 
+const captureStatusLabels: Record<WindowCaptureSnapshot["status"], string> = {
+  captured: "캡처됨",
+  permission_missing: "권한 필요",
+  app_not_running: "앱 대기",
+  window_not_found: "창 없음",
+  capture_failed: "캡처 실패",
+  unsupported_macos: "macOS 미지원",
+  helper_unavailable: "확인 불가",
+};
+
 type NativeBridgePanelProps = {
   readonly snapshot: WindowDiscoverySnapshot | undefined;
   readonly accessibilitySnapshot: AccessibilityTreeSnapshot | undefined;
+  readonly captureSnapshot: WindowCaptureSnapshot | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
   readonly onReadAccessibilityTree: (targetId: TargetAppId) => Promise<void>;
+  readonly onCaptureWindow: (targetId: TargetAppId) => Promise<void>;
 };
 
 export const NativeBridgePanel = ({
   snapshot,
   accessibilitySnapshot,
+  captureSnapshot,
   onRefresh,
   onFocusTarget,
   onReadAccessibilityTree,
+  onCaptureWindow,
 }: NativeBridgePanelProps) => (
   <section className="bridge-panel glass-panel" aria-label="Native helper window discovery">
     <div className="bridge-heading">
@@ -87,6 +102,14 @@ export const NativeBridgePanel = ({
             <ListTree size={15} aria-hidden="true" />
             AX 읽기
           </button>
+          <button
+            type="button"
+            className="secondary-button target-action"
+            onClick={() => onCaptureWindow(target.id)}
+            disabled={!snapshot?.helperAvailable}
+          >
+            <Camera size={15} aria-hidden="true" />창 캡처
+          </button>
         </article>
       ))}
     </div>
@@ -100,6 +123,19 @@ export const NativeBridgePanel = ({
         <p>
           노드 {accessibilitySnapshot.nodeCount}개 · 텍스트 노드{" "}
           {accessibilitySnapshot.textNodeCount}개
+        </p>
+      </article>
+    ) : null}
+
+    {captureSnapshot !== undefined ? (
+      <article className="window-capture-summary">
+        <div className="window-capture-summary-header">
+          <strong>{captureSnapshot.target.title}</strong>
+          <span>{captureStatusLabels[captureSnapshot.status]}</span>
+        </div>
+        <p>
+          {captureSnapshot.imageWidth} x {captureSnapshot.imageHeight} ·{" "}
+          {captureSnapshot.byteCount.toLocaleString()} bytes
         </p>
       </article>
     ) : null}

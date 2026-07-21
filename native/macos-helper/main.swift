@@ -16,6 +16,11 @@ func run(arguments: [String]) throws {
       throw HelperError.invalidCommand
     }
     try printJson(readAccessibilityTree(targetId: arguments[2]))
+  case "capture_window":
+    guard arguments.count == 3 else {
+      throw HelperError.invalidCommand
+    }
+    try printJson(captureWindow(targetId: arguments[2]))
   default:
     throw HelperError.invalidCommand
   }

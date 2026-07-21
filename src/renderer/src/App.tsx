@@ -4,6 +4,7 @@ import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-
 import type { OnboardingStatus } from "../../shared/onboarding-model";
 import type { SystemPermissionId, SystemPermissionSnapshot } from "../../shared/permission-model";
 import type { StageId, TaskSnapshot } from "../../shared/task-model";
+import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 import { NativeBridgePanel } from "./NativeBridgePanel";
 import { OnboardingPanel } from "./OnboardingPanel";
@@ -23,6 +24,9 @@ export const App = () => {
   >(undefined);
   const [accessibilityTreeSnapshot, setAccessibilityTreeSnapshot] = useState<
     AccessibilityTreeSnapshot | undefined
+  >(undefined);
+  const [windowCaptureSnapshot, setWindowCaptureSnapshot] = useState<
+    WindowCaptureSnapshot | undefined
   >(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
@@ -83,6 +87,10 @@ export const App = () => {
 
   const readAccessibilityTree = async (targetId: TargetAppId) => {
     setAccessibilityTreeSnapshot(await window.doon.readAccessibilityTree({ targetId }));
+  };
+
+  const captureWindow = async (targetId: TargetAppId) => {
+    setWindowCaptureSnapshot(await window.doon.captureWindow({ targetId }));
   };
 
   if (onboardingStatus === undefined) {
@@ -195,9 +203,11 @@ export const App = () => {
       <NativeBridgePanel
         snapshot={windowDiscoverySnapshot}
         accessibilitySnapshot={accessibilityTreeSnapshot}
+        captureSnapshot={windowCaptureSnapshot}
         onRefresh={refreshWindowDiscovery}
         onFocusTarget={focusTargetApp}
         onReadAccessibilityTree={readAccessibilityTree}
+        onCaptureWindow={captureWindow}
       />
 
       <TaskWorkspace

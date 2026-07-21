@@ -55,6 +55,21 @@ struct AccessibilityTreePayload: Codable {
   let nodes: [AccessibilityNode]
 }
 
+struct WindowCapturePayload: Codable {
+  let platform: String
+  let checkedAt: String
+  let target: AppTarget
+  let status: String
+  let screenCaptureTrusted: Bool
+  let windowTitle: String
+  let windowBounds: WindowBounds?
+  let imageWidth: Int
+  let imageHeight: Int
+  let byteCount: Int
+  let filePath: String
+  let errorMessage: String?
+}
+
 enum HelperError: Error, CustomStringConvertible {
   case invalidCommand
   case unknownTarget(String)
@@ -64,7 +79,7 @@ enum HelperError: Error, CustomStringConvertible {
   var description: String {
     switch self {
     case .invalidCommand:
-      return "Usage: DoonHelper list_windows | focus_app <target-id> | read_ax_tree <target-id>"
+      return "Usage: DoonHelper list_windows | focus_app <target-id> | read_ax_tree <target-id> | capture_window <target-id>"
     case .unknownTarget(let targetId):
       return "Unknown target app: \(targetId)"
     case .appNotFound(let bundleId):

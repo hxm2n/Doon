@@ -470,7 +470,8 @@ textarea:focus-visible {
   width: 100%;
 }
 
-.accessibility-summary {
+.accessibility-summary,
+.window-capture-summary {
   display: grid;
   gap: 6px;
   padding: 12px 14px;
@@ -481,19 +482,22 @@ textarea:focus-visible {
     color-mix(in srgb, var(--surface) 80%, transparent);
 }
 
-.accessibility-summary-header {
+.accessibility-summary-header,
+.window-capture-summary-header {
   display: flex;
   justify-content: space-between;
   gap: 12px;
 }
 
-.accessibility-summary span {
+.accessibility-summary span,
+.window-capture-summary span {
   color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 700;
 }
 
-.accessibility-summary p {
+.accessibility-summary p,
+.window-capture-summary p {
   margin: 0;
   color: var(--text-tertiary);
   font-size: 0.82rem;
