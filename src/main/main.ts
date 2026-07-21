@@ -1,6 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, globalShortcut, ipcMain } from "electron";
 import { completeOnboardingStatus, resetOnboardingStatus } from "../shared/onboarding-model";
+import { openSystemPermissionSettingsInputSchema } from "../shared/permission-model";
 import {
   approveStage,
   cancelTask,
@@ -15,6 +16,7 @@ import {
   stageActionInputSchema,
   type TaskSnapshot,
 } from "../shared/task-model";
+import { openSystemPermissionSettings, readSystemPermissionSnapshot } from "./system-permissions";
 import { TaskRepository } from "./task-repository";
 
 let mainWindow: BrowserWindow | undefined;
@@ -74,6 +76,13 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:get-current-task", () => currentTask);
 
   ipcMain.handle("doon:get-onboarding-status", () => repository.loadOnboardingStatus());
+
+  ipcMain.handle("doon:get-system-permission-snapshot", () => readSystemPermissionSnapshot());
+
+  ipcMain.handle("doon:open-system-permission-settings", (_event, payload: unknown) => {
+    const input = openSystemPermissionSettingsInputSchema.parse(payload);
+    return openSystemPermissionSettings(input.permissionId);
+  });
 
   ipcMain.handle("doon:complete-onboarding", () => {
     const onboardingStatus = completeOnboardingStatus(new Date().toISOString());
