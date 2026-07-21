@@ -10,7 +10,7 @@
     "make": "electron-forge make",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "ELECTRON_RUN_AS_NODE=1 electron ./node_modules/vitest/vitest.mjs run",
     "build": "electron-forge package"
   },
   "keywords": [],

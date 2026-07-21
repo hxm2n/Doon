@@ -8,7 +8,7 @@ import {
   RotateCcw,
   Shield,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type StageId, stageDefinitions, type TaskSnapshot } from "../../shared/task-model";
 
 const defaultCommand =
@@ -18,6 +18,19 @@ export const App = () => {
   const [command, setCommand] = useState(defaultCommand);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
+
+  useEffect(() => {
+    let isMounted = true;
+    window.doon.getCurrentTask().then((savedTask) => {
+      if (isMounted) {
+        setTask(savedTask);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const createTask = async () => {
     const nextTask = await window.doon.createTask({
