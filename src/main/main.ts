@@ -13,6 +13,7 @@ import {
   stageActionInputSchema,
   type TaskSnapshot,
 } from "../shared/task-model";
+import { TaskRepository } from "./task-repository";
 
 let mainWindow: BrowserWindow | undefined;
 let currentTask: TaskSnapshot | undefined;
@@ -55,16 +56,25 @@ const focusMainWindow = (): void => {
   mainWindow.focus();
 };
 
-const registerIpcHandlers = (): void => {
+const persistCurrentTask = (repository: TaskRepository): TaskSnapshot | undefined => {
+  if (currentTask !== undefined) {
+    repository.saveTask(currentTask);
+  }
+  return currentTask;
+};
+
+const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:app-info", () => ({
     name: "Doon",
     version: app.getVersion(),
   }));
 
+  ipcMain.handle("doon:get-current-task", () => currentTask);
+
   ipcMain.handle("doon:create-task", (_event, payload: unknown) => {
     const input = createTaskInputSchema.parse(payload);
     currentTask = createPlannedTask(input, crypto.randomUUID());
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 
   ipcMain.handle("doon:start-stage", (_event, payload: unknown) => {
@@ -73,7 +83,7 @@ const registerIpcHandlers = (): void => {
       return undefined;
     }
     currentTask = markStageReadyForReview(currentTask, input.stageId);
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 
   ipcMain.handle("doon:approve-stage", (_event, payload: unknown) => {
@@ -82,7 +92,7 @@ const registerIpcHandlers = (): void => {
       return undefined;
     }
     currentTask = approveStage(currentTask, input.stageId);
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 
   ipcMain.handle("doon:revise-stage", (_event, payload: unknown) => {
@@ -91,7 +101,7 @@ const registerIpcHandlers = (): void => {
       return undefined;
     }
     currentTask = reviseStage(currentTask, input);
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 
   ipcMain.handle("doon:pause-task", () => {
@@ -99,7 +109,7 @@ const registerIpcHandlers = (): void => {
       return undefined;
     }
     currentTask = pauseTask(currentTask);
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 
   ipcMain.handle("doon:resume-task", () => {
@@ -107,7 +117,7 @@ const registerIpcHandlers = (): void => {
       return undefined;
     }
     currentTask = resumeTask(currentTask);
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 
   ipcMain.handle("doon:cancel-task", () => {
@@ -115,12 +125,14 @@ const registerIpcHandlers = (): void => {
       return undefined;
     }
     currentTask = cancelTask(currentTask);
-    return currentTask;
+    return persistCurrentTask(repository);
   });
 };
 
 app.whenReady().then(() => {
-  registerIpcHandlers();
+  const repository = new TaskRepository(path.join(app.getPath("userData"), "doon.sqlite"));
+  currentTask = repository.loadLatestTask();
+  registerIpcHandlers(repository);
   createWindow();
   globalShortcut.register("CommandOrControl+Shift+Space", focusMainWindow);
 

@@ -6,7 +6,7 @@ import type {
   StageActionInput,
   TaskSnapshot,
 } from "../shared/task-model";
-import { taskSnapshotSchema } from "../shared/task-model";
+import { parseOptionalTaskSnapshot } from "../shared/task-snapshot-parser";
 
 export type DoonAppInfo = {
   readonly name: string;
@@ -15,6 +15,7 @@ export type DoonAppInfo = {
 
 export type DoonApi = {
   readonly getAppInfo: () => Promise<DoonAppInfo>;
+  readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
   readonly approveStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -29,28 +30,6 @@ const appInfoSchema = z.object({
   version: z.string(),
 });
 
-const optionalTaskSnapshotSchema = taskSnapshotSchema.optional();
-
-const normalizeTaskSnapshot = (task: z.infer<typeof taskSnapshotSchema>): TaskSnapshot => {
-  const snapshot = {
-    id: task.id,
-    command: task.command,
-    contextLine: task.contextLine,
-    status: task.status,
-    currentStageId: task.currentStageId,
-    stages: task.stages,
-  };
-
-  if (task.pausedFrom === undefined) {
-    return snapshot;
-  }
-
-  return {
-    ...snapshot,
-    pausedFrom: task.pausedFrom,
-  };
-};
-
 const invokeTask = async (
   channel: string,
   input?: CreateTaskInput | StageActionInput | RevisionInput,
@@ -59,12 +38,12 @@ const invokeTask = async (
     input === undefined
       ? await ipcRenderer.invoke(channel)
       : await ipcRenderer.invoke(channel, input);
-  const task = optionalTaskSnapshotSchema.parse(result);
-  return task === undefined ? undefined : normalizeTaskSnapshot(task);
+  return parseOptionalTaskSnapshot(result);
 };
 
 const doonApi: DoonApi = {
   getAppInfo: async () => appInfoSchema.parse(await ipcRenderer.invoke("doon:app-info")),
+  getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),
   startStage: (input) => invokeTask("doon:start-stage", input),
   approveStage: (input) => invokeTask("doon:approve-stage", input),
