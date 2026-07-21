@@ -470,6 +470,36 @@ textarea:focus-visible {
   width: 100%;
 }
 
+.accessibility-summary {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background:
+    linear-gradient(145deg, var(--liquid-readability), transparent),
+    color-mix(in srgb, var(--surface) 80%, transparent);
+}
+
+.accessibility-summary-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.accessibility-summary span {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.accessibility-summary p {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .palette-header,
 .context-row,
 .action-row,

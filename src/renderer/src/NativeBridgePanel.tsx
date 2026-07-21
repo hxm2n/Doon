@@ -1,4 +1,5 @@
-import { AppWindow, RefreshCcw, ScanSearch } from "lucide-react";
+import { AppWindow, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
+import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 
 const stateLabels: Record<WindowDiscoverySnapshot["targets"][number]["state"], string> = {
@@ -8,16 +9,28 @@ const stateLabels: Record<WindowDiscoverySnapshot["targets"][number]["state"], s
   helper_unavailable: "확인 불가",
 };
 
+const accessibilityStatusLabels: Record<AccessibilityTreeSnapshot["status"], string> = {
+  readable: "텍스트 확인 가능",
+  empty: "노드 없음",
+  permission_missing: "권한 필요",
+  app_not_running: "앱 대기",
+  helper_unavailable: "확인 불가",
+};
+
 type NativeBridgePanelProps = {
   readonly snapshot: WindowDiscoverySnapshot | undefined;
+  readonly accessibilitySnapshot: AccessibilityTreeSnapshot | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
+  readonly onReadAccessibilityTree: (targetId: TargetAppId) => Promise<void>;
 };
 
 export const NativeBridgePanel = ({
   snapshot,
+  accessibilitySnapshot,
   onRefresh,
   onFocusTarget,
+  onReadAccessibilityTree,
 }: NativeBridgePanelProps) => (
   <section className="bridge-panel glass-panel" aria-label="Native helper window discovery">
     <div className="bridge-heading">
@@ -65,8 +78,30 @@ export const NativeBridgePanel = ({
             <ScanSearch size={15} aria-hidden="true" />
             포커스
           </button>
+          <button
+            type="button"
+            className="secondary-button target-action"
+            onClick={() => onReadAccessibilityTree(target.id)}
+            disabled={!snapshot?.helperAvailable}
+          >
+            <ListTree size={15} aria-hidden="true" />
+            AX 읽기
+          </button>
         </article>
       ))}
     </div>
+
+    {accessibilitySnapshot !== undefined ? (
+      <article className="accessibility-summary">
+        <div className="accessibility-summary-header">
+          <strong>{accessibilitySnapshot.target.title}</strong>
+          <span>{accessibilityStatusLabels[accessibilitySnapshot.status]}</span>
+        </div>
+        <p>
+          노드 {accessibilitySnapshot.nodeCount}개 · 텍스트 노드{" "}
+          {accessibilitySnapshot.textNodeCount}개
+        </p>
+      </article>
+    ) : null}
   </section>
 );
