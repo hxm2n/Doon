@@ -9,6 +9,7 @@ const config: ForgeConfig = {
     executableName: "Doon",
     name: "Doon",
     appBundleId: "app.doon.desktop",
+    extraResource: ["native/macos-helper/DoonHelper"],
   },
   rebuildConfig: {},
   makers: [new MakerZIP({}, ["darwin"]), new MakerDMG({})],

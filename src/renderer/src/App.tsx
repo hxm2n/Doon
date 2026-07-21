@@ -1,18 +1,12 @@
-import {
-  Check,
-  CircleStop,
-  FileCheck,
-  Pause,
-  Play,
-  RefreshCcw,
-  RotateCcw,
-  Shield,
-} from "lucide-react";
+import { CircleStop, Play, RotateCcw, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { OnboardingStatus } from "../../shared/onboarding-model";
 import type { SystemPermissionId, SystemPermissionSnapshot } from "../../shared/permission-model";
-import { type StageId, stageDefinitions, type TaskSnapshot } from "../../shared/task-model";
+import type { StageId, TaskSnapshot } from "../../shared/task-model";
+import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
+import { NativeBridgePanel } from "./NativeBridgePanel";
 import { OnboardingPanel } from "./OnboardingPanel";
+import { TaskWorkspace } from "./TaskWorkspace";
 
 const defaultCommand =
   "학생회 디스코드에서 행사 계획서 요구사항을 확인하고, 형식에 맞는 한글 문서를 만들어서 학생회 문서 폴더에 저장해줘.";
@@ -23,6 +17,9 @@ export const App = () => {
   const [permissionSnapshot, setPermissionSnapshot] = useState<
     SystemPermissionSnapshot | undefined
   >(undefined);
+  const [windowDiscoverySnapshot, setWindowDiscoverySnapshot] = useState<
+    WindowDiscoverySnapshot | undefined
+  >(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
 
@@ -31,14 +28,23 @@ export const App = () => {
     Promise.all([
       window.doon.getOnboardingStatus(),
       window.doon.getSystemPermissionSnapshot(),
+      window.doon.getWindowDiscoverySnapshot(),
       window.doon.getCurrentTask(),
-    ]).then(([savedOnboardingStatus, savedPermissionSnapshot, savedTask]) => {
-      if (isMounted) {
-        setOnboardingStatus(savedOnboardingStatus);
-        setPermissionSnapshot(savedPermissionSnapshot);
-        setTask(savedTask);
-      }
-    });
+    ]).then(
+      ([
+        savedOnboardingStatus,
+        savedPermissionSnapshot,
+        savedWindowDiscoverySnapshot,
+        savedTask,
+      ]) => {
+        if (isMounted) {
+          setOnboardingStatus(savedOnboardingStatus);
+          setPermissionSnapshot(savedPermissionSnapshot);
+          setWindowDiscoverySnapshot(savedWindowDiscoverySnapshot);
+          setTask(savedTask);
+        }
+      },
+    );
 
     return () => {
       isMounted = false;
@@ -61,6 +67,14 @@ export const App = () => {
   const openPermissionSettings = async (permissionId: SystemPermissionId) => {
     await window.doon.openSystemPermissionSettings({ permissionId });
     await refreshPermissions();
+  };
+
+  const refreshWindowDiscovery = async () => {
+    setWindowDiscoverySnapshot(await window.doon.getWindowDiscoverySnapshot());
+  };
+
+  const focusTargetApp = async (targetId: TargetAppId) => {
+    setWindowDiscoverySnapshot(await window.doon.focusTargetApp({ targetId }));
   };
 
   if (onboardingStatus === undefined) {
@@ -119,8 +133,6 @@ export const App = () => {
   const resumeTask = async () => setTask(await window.doon.resumeTask());
   const cancelTask = async () => setTask(await window.doon.cancelTask());
 
-  const activeStage = task?.stages.find((stage) => stage.id === task.currentStageId);
-
   return (
     <main className="app-shell">
       <section className="palette glass-panel" aria-label="Doon command palette">
@@ -172,97 +184,23 @@ export const App = () => {
         </div>
       </section>
 
-      <section className="workspace" aria-label="Task plan and review">
-        <div className="hud glass-panel">
-          <div>
-            <p className="caption">현재 단계</p>
-            <strong>{activeStage?.title ?? "대기 중"}</strong>
-          </div>
-          <div className="hud-actions">
-            <button type="button" className="icon-button" onClick={pauseTask} aria-label="일시정지">
-              <Pause size={16} aria-hidden="true" />
-            </button>
-            <button type="button" className="icon-button" onClick={resumeTask} aria-label="재개">
-              <Play size={16} aria-hidden="true" />
-            </button>
-          </div>
-        </div>
+      <NativeBridgePanel
+        snapshot={windowDiscoverySnapshot}
+        onRefresh={refreshWindowDiscovery}
+        onFocusTarget={focusTargetApp}
+      />
 
-        <div className="stage-list">
-          {(task?.stages ?? stageDefinitions).map((stage) => (
-            <article className="stage-row" key={stage.id}>
-              <div className="stage-marker" data-state={"state" in stage ? stage.state : "pending"}>
-                {"state" in stage && stage.state === "approved" ? (
-                  <Check size={15} aria-hidden="true" />
-                ) : (
-                  <FileCheck size={15} aria-hidden="true" />
-                )}
-              </div>
-              <div className="stage-copy">
-                <div className="stage-title">
-                  <strong>{stage.title}</strong>
-                  <span>{"state" in stage ? stage.state : "pending"}</span>
-                </div>
-                <p>{stage.outcome}</p>
-                <small>{stage.context}</small>
-              </div>
-              {"state" in stage && stage.state === "active" ? (
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => startStage(stage.id)}
-                >
-                  실행
-                </button>
-              ) : null}
-            </article>
-          ))}
-        </div>
-
-        {activeStage !== undefined ? (
-          <section className="review-panel" aria-label="Stage checkpoint review">
-            <div>
-              <p className="eyebrow">Checkpoint</p>
-              <h2>{activeStage.title}</h2>
-              <p>{activeStage.result || "이 단계의 결과를 기다리고 있습니다."}</p>
-            </div>
-            <textarea
-              value={revision}
-              onChange={(event) => setRevision(event.currentTarget.value)}
-              className="revision-input"
-              rows={2}
-              placeholder="수정 방향을 입력"
-            />
-            <div className="approval-row">
-              <button
-                type="button"
-                className="primary-button"
-                onClick={() => approveStage(activeStage.id)}
-              >
-                <Check size={16} aria-hidden="true" />
-                승인
-              </button>
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={() => reviseStage(activeStage.id)}
-              >
-                <RotateCcw size={16} aria-hidden="true" />
-                수정 반영
-              </button>
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => rerunStage(activeStage.id)}
-                aria-label="현재 단계 재실행"
-                title="현재 단계 재실행"
-              >
-                <RefreshCcw size={16} aria-hidden="true" />
-              </button>
-            </div>
-          </section>
-        ) : null}
-      </section>
+      <TaskWorkspace
+        task={task}
+        revision={revision}
+        onRevisionChange={setRevision}
+        onStartStage={startStage}
+        onApproveStage={approveStage}
+        onReviseStage={reviseStage}
+        onRerunStage={rerunStage}
+        onPauseTask={pauseTask}
+        onResumeTask={resumeTask}
+      />
     </main>
   );
 };
