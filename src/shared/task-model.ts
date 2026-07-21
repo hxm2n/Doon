@@ -197,7 +197,7 @@ export const cancelTask = (task: TaskSnapshot): TaskSnapshot => ({
 
 export const reviseStage = (task: TaskSnapshot, input: RevisionInput): TaskSnapshot => ({
   ...task,
-  status: "revising",
+  status: "awaiting_review",
   currentStageId: input.stageId,
   stages: task.stages.map((stage) =>
     stage.id === input.stageId
@@ -209,6 +209,27 @@ export const reviseStage = (task: TaskSnapshot, input: RevisionInput): TaskSnaps
       : stage,
   ),
 });
+
+export const rerunStage = (task: TaskSnapshot, input: StageActionInput): TaskSnapshot => {
+  if (!task.stages.some((stage) => stage.id === input.stageId)) {
+    return task;
+  }
+
+  return {
+    ...task,
+    status: "executing",
+    currentStageId: input.stageId,
+    stages: task.stages.map((stage) =>
+      stage.id === input.stageId
+        ? {
+            ...stage,
+            state: "active",
+            result: "",
+          }
+        : stage,
+    ),
+  };
+};
 
 const getDemoResult = (stageId: StageId): string => {
   switch (stageId) {
