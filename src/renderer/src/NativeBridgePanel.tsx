@@ -1,7 +1,8 @@
-import { AppWindow, Camera, Globe, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
+import { AppWindow, Camera, Database, Globe, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
 import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
 import type { ActionProposal } from "../../shared/action-proposal-model";
 import type { ChromeSessionSnapshot } from "../../shared/chrome-session-model";
+import type { PersistenceDiagnosticSnapshot } from "../../shared/persistence-diagnostic-model";
 import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 
@@ -44,18 +45,25 @@ const chromeSessionStatusLabels: Record<ChromeSessionSnapshot["status"], string>
   helper_unavailable: "확인 불가",
 };
 
+const persistenceDiagnosticStatusLabels: Record<PersistenceDiagnosticSnapshot["status"], string> = {
+  ready: "SQLite 준비됨",
+  failed: "SQLite 실패",
+};
+
 type NativeBridgePanelProps = {
   readonly snapshot: WindowDiscoverySnapshot | undefined;
   readonly accessibilitySnapshot: AccessibilityTreeSnapshot | undefined;
   readonly captureSnapshot: WindowCaptureSnapshot | undefined;
   readonly actionProposal: ActionProposal | undefined;
   readonly chromeSessionSnapshot: ChromeSessionSnapshot | undefined;
+  readonly persistenceDiagnostic: PersistenceDiagnosticSnapshot | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
   readonly onReadAccessibilityTree: (targetId: TargetAppId) => Promise<void>;
   readonly onCaptureWindow: (targetId: TargetAppId) => Promise<void>;
   readonly onReadChromeSession: () => Promise<void>;
   readonly onLaunchChromeSession: () => Promise<void>;
+  readonly onRunPersistenceDiagnostic: () => Promise<void>;
   readonly onProposeAction: () => Promise<void>;
 };
 
@@ -65,12 +73,14 @@ export const NativeBridgePanel = ({
   captureSnapshot,
   actionProposal,
   chromeSessionSnapshot,
+  persistenceDiagnostic,
   onRefresh,
   onFocusTarget,
   onReadAccessibilityTree,
   onCaptureWindow,
   onReadChromeSession,
   onLaunchChromeSession,
+  onRunPersistenceDiagnostic,
   onProposeAction,
 }: NativeBridgePanelProps) => (
   <section className="bridge-panel glass-panel" aria-label="Native helper window discovery">
@@ -108,6 +118,14 @@ export const NativeBridgePanel = ({
       >
         <Globe size={15} aria-hidden="true" />
         테스트 창 열기
+      </button>
+      <button
+        type="button"
+        className="secondary-button target-action"
+        onClick={onRunPersistenceDiagnostic}
+      >
+        <Database size={15} aria-hidden="true" />
+        SQLite 진단
       </button>
     </div>
 
@@ -205,6 +223,19 @@ export const NativeBridgePanel = ({
           <span>{chromeSessionSnapshot.sessionId}</span>
         </div>
         <p>{chromeSessionSnapshot.windowTitle || chromeSessionSnapshot.markerTitle}</p>
+      </article>
+    ) : null}
+
+    {persistenceDiagnostic !== undefined ? (
+      <article className="persistence-diagnostic-summary">
+        <div className="persistence-diagnostic-summary-header">
+          <strong>{persistenceDiagnosticStatusLabels[persistenceDiagnostic.status]}</strong>
+          <span>{persistenceDiagnostic.journalMode}</span>
+        </div>
+        <p>
+          task {persistenceDiagnostic.taskCount}개 · setting {persistenceDiagnostic.settingCount}개
+          · secure_delete {persistenceDiagnostic.secureDelete ? "on" : "off"}
+        </p>
       </article>
     ) : null}
   </section>

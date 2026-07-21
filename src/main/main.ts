@@ -91,6 +91,8 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
 
   ipcMain.handle("doon:get-onboarding-status", () => repository.loadOnboardingStatus());
 
+  ipcMain.handle("doon:run-persistence-diagnostic", () => repository.runPersistenceDiagnostic());
+
   ipcMain.handle("doon:get-system-permission-snapshot", () => readSystemPermissionSnapshot());
 
   ipcMain.handle("doon:open-system-permission-settings", (_event, payload: unknown) => {
