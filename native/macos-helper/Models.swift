@@ -82,6 +82,17 @@ struct ChromeSessionPayload: Codable {
   let errorMessage: String?
 }
 
+struct HwpFilePayload: Codable {
+  let platform: String
+  let checkedAt: String
+  let status: String
+  let sourcePath: String
+  let destinationPath: String
+  let finalPath: String
+  let byteCount: Int
+  let errorMessage: String?
+}
+
 enum HelperError: Error, CustomStringConvertible {
   case invalidCommand
   case invalidSessionId(String)
@@ -92,7 +103,7 @@ enum HelperError: Error, CustomStringConvertible {
   var description: String {
     switch self {
     case .invalidCommand:
-      return "Usage: DoonHelper list_windows | focus_app <target-id> | read_ax_tree <target-id> | capture_window <target-id> | read_chrome_session <session-id> | launch_chrome_session <session-id>"
+      return "Usage: DoonHelper list_windows | focus_app <target-id> | read_ax_tree <target-id> | capture_window <target-id> | read_chrome_session <session-id> | launch_chrome_session <session-id> | verify_hwp <source-path> | move_downloaded_hwp <source-path> <destination-dir> <final-name>"
     case .invalidSessionId(let sessionId):
       return "Invalid session id: \(sessionId)"
     case .unknownTarget(let targetId):

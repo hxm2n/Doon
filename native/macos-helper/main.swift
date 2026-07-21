@@ -31,6 +31,22 @@ func run(arguments: [String]) throws {
       throw HelperError.invalidCommand
     }
     try printJson(launchChromeSession(sessionId: arguments[2]))
+  case "verify_hwp":
+    guard arguments.count == 3 else {
+      throw HelperError.invalidCommand
+    }
+    try printJson(verifyHwp(path: arguments[2]))
+  case "move_downloaded_hwp":
+    guard arguments.count == 5 else {
+      throw HelperError.invalidCommand
+    }
+    try printJson(
+      moveDownloadedHwp(
+        sourcePath: arguments[2],
+        destinationDirectoryPath: arguments[3],
+        finalName: arguments[4]
+      )
+    )
   default:
     throw HelperError.invalidCommand
   }
