@@ -1,5 +1,11 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { z } from "zod";
+import {
+  type AccessibilityTreeSnapshot,
+  accessibilityTreeSnapshotSchema,
+  type ReadAccessibilityTreeInput,
+  readAccessibilityTreeInputSchema,
+} from "../shared/accessibility-tree-model";
 import { type OnboardingStatus, onboardingStatusSchema } from "../shared/onboarding-model";
 import {
   type OpenSystemPermissionSettingsInput,
@@ -37,6 +43,9 @@ export type DoonApi = {
   ) => Promise<void>;
   readonly getWindowDiscoverySnapshot: () => Promise<WindowDiscoverySnapshot>;
   readonly focusTargetApp: (input: FocusTargetAppInput) => Promise<WindowDiscoverySnapshot>;
+  readonly readAccessibilityTree: (
+    input: ReadAccessibilityTreeInput,
+  ) => Promise<AccessibilityTreeSnapshot>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -89,6 +98,13 @@ const doonApi: DoonApi = {
   focusTargetApp: async (input) =>
     windowDiscoverySnapshotSchema.parse(
       await ipcRenderer.invoke("doon:focus-target-app", focusTargetAppInputSchema.parse(input)),
+    ),
+  readAccessibilityTree: async (input) =>
+    accessibilityTreeSnapshotSchema.parse(
+      await ipcRenderer.invoke(
+        "doon:read-accessibility-tree",
+        readAccessibilityTreeInputSchema.parse(input),
+      ),
     ),
   getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),

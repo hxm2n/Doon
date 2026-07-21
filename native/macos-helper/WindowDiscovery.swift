@@ -2,72 +2,6 @@ import AppKit
 import CoreGraphics
 import Foundation
 
-struct AppTarget: Codable {
-  let id: String
-  let title: String
-  let bundleId: String
-}
-
-struct WindowBounds: Codable {
-  let x: Int
-  let y: Int
-  let width: Int
-  let height: Int
-}
-
-struct NativeWindow: Codable {
-  let ownerName: String
-  let ownerPid: Int
-  let title: String
-  let bounds: WindowBounds
-}
-
-struct TargetAppStatus: Codable {
-  let id: String
-  let title: String
-  let bundleId: String
-  let state: String
-  let windowCount: Int
-}
-
-struct WindowDiscoveryPayload: Codable {
-  let platform: String
-  let checkedAt: String
-  let targets: [TargetAppStatus]
-  let windows: [NativeWindow]
-}
-
-enum HelperError: Error, CustomStringConvertible {
-  case invalidCommand
-  case unknownTarget(String)
-  case appNotFound(String)
-  case launchFailed(String)
-
-  var description: String {
-    switch self {
-    case .invalidCommand:
-      return "Usage: DoonHelper list_windows | focus_app <target-id>"
-    case .unknownTarget(let targetId):
-      return "Unknown target app: \(targetId)"
-    case .appNotFound(let bundleId):
-      return "Application was not found: \(bundleId)"
-    case .launchFailed(let message):
-      return "Application launch failed: \(message)"
-    }
-  }
-}
-
-let targets = [
-  AppTarget(id: "discord", title: "Discord", bundleId: "com.hnc.Discord"),
-  AppTarget(id: "chrome", title: "Google Chrome", bundleId: "com.google.Chrome"),
-]
-
-func isoNow() -> String {
-  let formatter = ISO8601DateFormatter()
-  formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-  return formatter.string(from: Date())
-}
-
 func windowBounds(from value: Any?) -> WindowBounds? {
   guard let bounds = value as? [String: Any],
     let x = bounds["X"] as? Int,
@@ -122,7 +56,7 @@ func targetStatus(for target: AppTarget, windows: [NativeWindow]) -> TargetAppSt
   )
 }
 
-func readPayload() -> WindowDiscoveryPayload {
+func readWindowDiscoveryPayload() -> WindowDiscoveryPayload {
   let windows = readWindows()
   return WindowDiscoveryPayload(
     platform: "darwin",
@@ -133,10 +67,7 @@ func readPayload() -> WindowDiscoveryPayload {
 }
 
 func focusApp(targetId: String) throws {
-  guard let target = targets.first(where: { $0.id == targetId }) else {
-    throw HelperError.unknownTarget(targetId)
-  }
-
+  let target = try resolveTarget(targetId)
   if let runningApp = NSWorkspace.shared.runningApplications.first(where: {
     $0.bundleIdentifier == target.bundleId
   }) {
@@ -161,38 +92,4 @@ func focusApp(targetId: String) throws {
   if let launchError {
     throw HelperError.launchFailed(launchError.localizedDescription)
   }
-}
-
-func printJson<T: Encodable>(_ value: T) throws {
-  let encoder = JSONEncoder()
-  encoder.outputFormatting = [.sortedKeys]
-  let data = try encoder.encode(value)
-  FileHandle.standardOutput.write(data)
-  FileHandle.standardOutput.write(Data("\n".utf8))
-}
-
-func run(arguments: [String]) throws {
-  let command = arguments.dropFirst().first
-  switch command {
-  case "list_windows":
-    try printJson(readPayload())
-  case "focus_app":
-    guard arguments.count == 3 else {
-      throw HelperError.invalidCommand
-    }
-    try focusApp(targetId: arguments[2])
-    try printJson(readPayload())
-  default:
-    throw HelperError.invalidCommand
-  }
-}
-
-do {
-  try run(arguments: CommandLine.arguments)
-} catch let error as HelperError {
-  FileHandle.standardError.write(Data("\(error.description)\n".utf8))
-  exit(2)
-} catch {
-  FileHandle.standardError.write(Data("\(error.localizedDescription)\n".utf8))
-  exit(1)
 }

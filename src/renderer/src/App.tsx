@@ -1,5 +1,6 @@
 import { CircleStop, Play, RotateCcw, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
+import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
 import type { OnboardingStatus } from "../../shared/onboarding-model";
 import type { SystemPermissionId, SystemPermissionSnapshot } from "../../shared/permission-model";
 import type { StageId, TaskSnapshot } from "../../shared/task-model";
@@ -19,6 +20,9 @@ export const App = () => {
   >(undefined);
   const [windowDiscoverySnapshot, setWindowDiscoverySnapshot] = useState<
     WindowDiscoverySnapshot | undefined
+  >(undefined);
+  const [accessibilityTreeSnapshot, setAccessibilityTreeSnapshot] = useState<
+    AccessibilityTreeSnapshot | undefined
   >(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
@@ -75,6 +79,10 @@ export const App = () => {
 
   const focusTargetApp = async (targetId: TargetAppId) => {
     setWindowDiscoverySnapshot(await window.doon.focusTargetApp({ targetId }));
+  };
+
+  const readAccessibilityTree = async (targetId: TargetAppId) => {
+    setAccessibilityTreeSnapshot(await window.doon.readAccessibilityTree({ targetId }));
   };
 
   if (onboardingStatus === undefined) {
@@ -186,8 +194,10 @@ export const App = () => {
 
       <NativeBridgePanel
         snapshot={windowDiscoverySnapshot}
+        accessibilitySnapshot={accessibilityTreeSnapshot}
         onRefresh={refreshWindowDiscovery}
         onFocusTarget={focusTargetApp}
+        onReadAccessibilityTree={readAccessibilityTree}
       />
 
       <TaskWorkspace

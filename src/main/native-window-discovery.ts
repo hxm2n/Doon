@@ -4,6 +4,12 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { app } from "electron";
 import {
+  type AccessibilityTreeSnapshot,
+  createUnavailableAccessibilityTreeSnapshot,
+  nativeAccessibilityTreePayloadSchema,
+  type ReadAccessibilityTreeInput,
+} from "../shared/accessibility-tree-model";
+import {
   createUnavailableWindowDiscoverySnapshot,
   type FocusTargetAppInput,
   nativeWindowDiscoveryPayloadSchema,
@@ -13,6 +19,10 @@ import {
 
 const execFileAsync = promisify(execFile);
 const helperExecutableName = "DoonHelper";
+
+type HelperRunResult =
+  | { readonly kind: "ok"; readonly stdout: string }
+  | { readonly kind: "unavailable"; readonly message: string };
 
 const getHelperPath = (): string =>
   app.isPackaged
@@ -29,14 +39,14 @@ const parseHelperOutput = (stdout: string): WindowDiscoverySnapshot => ({
   helperAvailable: true,
 });
 
-const runHelper = async (args: readonly string[]): Promise<WindowDiscoverySnapshot> => {
+const readHelperOutput = async (args: readonly string[]): Promise<HelperRunResult> => {
   if (process.platform !== "darwin") {
-    return helperUnavailable("Swift Helper는 macOS에서만 실행됩니다.");
+    return { kind: "unavailable", message: "Swift Helper는 macOS에서만 실행됩니다." };
   }
 
   const helperPath = getHelperPath();
   if (!fs.existsSync(helperPath)) {
-    return helperUnavailable("Swift Helper가 아직 빌드되지 않았습니다.");
+    return { kind: "unavailable", message: "Swift Helper가 아직 빌드되지 않았습니다." };
   }
 
   try {
@@ -44,17 +54,21 @@ const runHelper = async (args: readonly string[]): Promise<WindowDiscoverySnapsh
       timeout: 5_000,
       maxBuffer: 1024 * 1024,
     });
-    return parseHelperOutput(stdout);
+    return { kind: "ok", stdout };
   } catch (error) {
     if (error instanceof Error) {
-      return helperUnavailable(error.message);
+      return { kind: "unavailable", message: error.message };
     }
     throw error;
   }
 };
 
-export const readWindowDiscoverySnapshot = async (): Promise<WindowDiscoverySnapshot> =>
-  runHelper(["list_windows"]);
+export const readWindowDiscoverySnapshot = async (): Promise<WindowDiscoverySnapshot> => {
+  const result = await readHelperOutput(["list_windows"]);
+  return result.kind === "ok"
+    ? parseHelperOutput(result.stdout)
+    : helperUnavailable(result.message);
+};
 
 export const focusTargetApp = async (
   input: FocusTargetAppInput,
@@ -62,5 +76,26 @@ export const focusTargetApp = async (
   if (!targetAppDefinitions.some((target) => target.id === input.targetId)) {
     return helperUnavailable(`지원하지 않는 앱입니다: ${input.targetId}`);
   }
-  return runHelper(["focus_app", input.targetId]);
+  const result = await readHelperOutput(["focus_app", input.targetId]);
+  return result.kind === "ok"
+    ? parseHelperOutput(result.stdout)
+    : helperUnavailable(result.message);
+};
+
+export const readAccessibilityTreeSnapshot = async (
+  input: ReadAccessibilityTreeInput,
+): Promise<AccessibilityTreeSnapshot> => {
+  const result = await readHelperOutput(["read_ax_tree", input.targetId]);
+  if (result.kind === "unavailable") {
+    return createUnavailableAccessibilityTreeSnapshot(
+      input.targetId,
+      result.message,
+      currentTimestamp(),
+      process.platform,
+    );
+  }
+  return {
+    ...nativeAccessibilityTreePayloadSchema.parse(JSON.parse(result.stdout)),
+    helperAvailable: true,
+  };
 };

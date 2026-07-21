@@ -1,5 +1,6 @@
 import path from "node:path";
 import { app, BrowserWindow, globalShortcut, ipcMain } from "electron";
+import { readAccessibilityTreeInputSchema } from "../shared/accessibility-tree-model";
 import { completeOnboardingStatus, resetOnboardingStatus } from "../shared/onboarding-model";
 import { openSystemPermissionSettingsInputSchema } from "../shared/permission-model";
 import {
@@ -17,7 +18,11 @@ import {
   type TaskSnapshot,
 } from "../shared/task-model";
 import { focusTargetAppInputSchema } from "../shared/window-discovery-model";
-import { focusTargetApp, readWindowDiscoverySnapshot } from "./native-window-discovery";
+import {
+  focusTargetApp,
+  readAccessibilityTreeSnapshot,
+  readWindowDiscoverySnapshot,
+} from "./native-window-discovery";
 import { openSystemPermissionSettings, readSystemPermissionSnapshot } from "./system-permissions";
 import { TaskRepository } from "./task-repository";
 
@@ -91,6 +96,11 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:focus-target-app", (_event, payload: unknown) => {
     const input = focusTargetAppInputSchema.parse(payload);
     return focusTargetApp(input);
+  });
+
+  ipcMain.handle("doon:read-accessibility-tree", (_event, payload: unknown) => {
+    const input = readAccessibilityTreeInputSchema.parse(payload);
+    return readAccessibilityTreeSnapshot(input);
   });
 
   ipcMain.handle("doon:complete-onboarding", () => {
