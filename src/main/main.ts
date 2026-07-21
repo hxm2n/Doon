@@ -1,6 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, globalShortcut, ipcMain } from "electron";
 import { readAccessibilityTreeInputSchema } from "../shared/accessibility-tree-model";
+import { proposeActionInputSchema } from "../shared/action-proposal-model";
 import { completeOnboardingStatus, resetOnboardingStatus } from "../shared/onboarding-model";
 import { openSystemPermissionSettingsInputSchema } from "../shared/permission-model";
 import {
@@ -19,6 +20,7 @@ import {
 } from "../shared/task-model";
 import { captureWindowInputSchema } from "../shared/window-capture-model";
 import { focusTargetAppInputSchema } from "../shared/window-discovery-model";
+import { proposeGeminiAction } from "./gemini-action-provider";
 import {
   captureWindowSnapshot,
   focusTargetApp,
@@ -108,6 +110,11 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
   ipcMain.handle("doon:capture-window", (_event, payload: unknown) => {
     const input = captureWindowInputSchema.parse(payload);
     return captureWindowSnapshot(input);
+  });
+
+  ipcMain.handle("doon:propose-action", (_event, payload: unknown) => {
+    const input = proposeActionInputSchema.parse(payload);
+    return proposeGeminiAction(input);
   });
 
   ipcMain.handle("doon:complete-onboarding", () => {

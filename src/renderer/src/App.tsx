@@ -1,6 +1,7 @@
 import { CircleStop, Play, RotateCcw, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
+import type { ActionProposal } from "../../shared/action-proposal-model";
 import type { OnboardingStatus } from "../../shared/onboarding-model";
 import type { SystemPermissionId, SystemPermissionSnapshot } from "../../shared/permission-model";
 import type { StageId, TaskSnapshot } from "../../shared/task-model";
@@ -28,6 +29,7 @@ export const App = () => {
   const [windowCaptureSnapshot, setWindowCaptureSnapshot] = useState<
     WindowCaptureSnapshot | undefined
   >(undefined);
+  const [actionProposal, setActionProposal] = useState<ActionProposal | undefined>(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
 
@@ -91,6 +93,17 @@ export const App = () => {
 
   const captureWindow = async (targetId: TargetAppId) => {
     setWindowCaptureSnapshot(await window.doon.captureWindow({ targetId }));
+  };
+
+  const proposeAction = async () => {
+    setActionProposal(
+      await window.doon.proposeAction({
+        command,
+        stageId: task?.currentStageId ?? "requirements_collected",
+        accessibilitySnapshot: accessibilityTreeSnapshot,
+        captureSnapshot: windowCaptureSnapshot,
+      }),
+    );
   };
 
   if (onboardingStatus === undefined) {
@@ -204,10 +217,12 @@ export const App = () => {
         snapshot={windowDiscoverySnapshot}
         accessibilitySnapshot={accessibilityTreeSnapshot}
         captureSnapshot={windowCaptureSnapshot}
+        actionProposal={actionProposal}
         onRefresh={refreshWindowDiscovery}
         onFocusTarget={focusTargetApp}
         onReadAccessibilityTree={readAccessibilityTree}
         onCaptureWindow={captureWindow}
+        onProposeAction={proposeAction}
       />
 
       <TaskWorkspace

@@ -1,5 +1,6 @@
 import { AppWindow, Camera, ListTree, RefreshCcw, ScanSearch } from "lucide-react";
 import type { AccessibilityTreeSnapshot } from "../../shared/accessibility-tree-model";
+import type { ActionProposal } from "../../shared/action-proposal-model";
 import type { WindowCaptureSnapshot } from "../../shared/window-capture-model";
 import type { TargetAppId, WindowDiscoverySnapshot } from "../../shared/window-discovery-model";
 
@@ -28,24 +29,34 @@ const captureStatusLabels: Record<WindowCaptureSnapshot["status"], string> = {
   helper_unavailable: "확인 불가",
 };
 
+const proposalStatusLabels: Record<ActionProposal["status"], string> = {
+  proposed: "제안됨",
+  configuration_missing: "설정 필요",
+  provider_error: "호출 실패",
+};
+
 type NativeBridgePanelProps = {
   readonly snapshot: WindowDiscoverySnapshot | undefined;
   readonly accessibilitySnapshot: AccessibilityTreeSnapshot | undefined;
   readonly captureSnapshot: WindowCaptureSnapshot | undefined;
+  readonly actionProposal: ActionProposal | undefined;
   readonly onRefresh: () => Promise<void>;
   readonly onFocusTarget: (targetId: TargetAppId) => Promise<void>;
   readonly onReadAccessibilityTree: (targetId: TargetAppId) => Promise<void>;
   readonly onCaptureWindow: (targetId: TargetAppId) => Promise<void>;
+  readonly onProposeAction: () => Promise<void>;
 };
 
 export const NativeBridgePanel = ({
   snapshot,
   accessibilitySnapshot,
   captureSnapshot,
+  actionProposal,
   onRefresh,
   onFocusTarget,
   onReadAccessibilityTree,
   onCaptureWindow,
+  onProposeAction,
 }: NativeBridgePanelProps) => (
   <section className="bridge-panel glass-panel" aria-label="Native helper window discovery">
     <div className="bridge-heading">
@@ -62,6 +73,10 @@ export const NativeBridgePanel = ({
         <RefreshCcw size={16} aria-hidden="true" />
       </button>
     </div>
+    <button type="button" className="secondary-button target-action" onClick={onProposeAction}>
+      <ScanSearch size={15} aria-hidden="true" />
+      AI 행동 제안
+    </button>
 
     {snapshot?.errorMessage !== undefined ? (
       <p className="bridge-warning">{snapshot.errorMessage}</p>
@@ -137,6 +152,16 @@ export const NativeBridgePanel = ({
           {captureSnapshot.imageWidth} x {captureSnapshot.imageHeight} ·{" "}
           {captureSnapshot.byteCount.toLocaleString()} bytes
         </p>
+      </article>
+    ) : null}
+
+    {actionProposal !== undefined ? (
+      <article className="action-proposal-summary">
+        <div className="action-proposal-summary-header">
+          <strong>{proposalStatusLabels[actionProposal.status]}</strong>
+          <span>{actionProposal.action?.type ?? "no_action"}</span>
+        </div>
+        <p>{actionProposal.reason}</p>
       </article>
     ) : null}
   </section>

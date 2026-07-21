@@ -471,7 +471,8 @@ textarea:focus-visible {
 }
 
 .accessibility-summary,
-.window-capture-summary {
+.window-capture-summary,
+.action-proposal-summary {
   display: grid;
   gap: 6px;
   padding: 12px 14px;
@@ -483,21 +484,24 @@ textarea:focus-visible {
 }
 
 .accessibility-summary-header,
-.window-capture-summary-header {
+.window-capture-summary-header,
+.action-proposal-summary-header {
   display: flex;
   justify-content: space-between;
   gap: 12px;
 }
 
 .accessibility-summary span,
-.window-capture-summary span {
+.window-capture-summary span,
+.action-proposal-summary span {
   color: var(--text-secondary);
   font-size: 0.82rem;
   font-weight: 700;
 }
 
 .accessibility-summary p,
-.window-capture-summary p {
+.window-capture-summary p,
+.action-proposal-summary p {
   margin: 0;
   color: var(--text-tertiary);
   font-size: 0.82rem;
