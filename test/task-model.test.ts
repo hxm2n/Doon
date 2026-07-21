@@ -4,7 +4,9 @@ import {
   createPlannedTask,
   markStageReadyForReview,
   pauseTask,
+  rerunStage,
   resumeTask,
+  reviseStage,
   stageDefinitions,
 } from "../src/shared/task-model";
 
@@ -58,5 +60,45 @@ describe("task model", () => {
     expect(paused.status).toBe("paused_by_user");
     expect(paused.pausedFrom).toBe("planned");
     expect(resumed.status).toBe("planned");
+  });
+
+  it("keeps a revised stage ready for another approval", () => {
+    const task = createPlannedTask(
+      {
+        command: "문서를 만들어줘",
+        contextLine: "Discord - 학생회 · 현재 채널 · 학생회 문서 폴더",
+      },
+      "task-1",
+    );
+    const reviewed = markStageReadyForReview(task, "requirements_collected");
+
+    const revised = reviseStage(reviewed, {
+      stageId: "requirements_collected",
+      instruction: "누락 항목을 더 구체적으로 적어줘",
+    });
+
+    expect(revised.status).toBe("awaiting_review");
+    expect(revised.currentStageId).toBe("requirements_collected");
+    expect(revised.stages[0]?.state).toBe("awaiting_review");
+    expect(revised.stages[0]?.result).toContain("수정 요청");
+  });
+
+  it("reruns the same stage without advancing to the next stage", () => {
+    const task = createPlannedTask(
+      {
+        command: "문서를 만들어줘",
+        contextLine: "Discord - 학생회 · 현재 채널 · 학생회 문서 폴더",
+      },
+      "task-1",
+    );
+    const reviewed = markStageReadyForReview(task, "requirements_collected");
+
+    const rerunning = rerunStage(reviewed, { stageId: "requirements_collected" });
+
+    expect(rerunning.status).toBe("executing");
+    expect(rerunning.currentStageId).toBe("requirements_collected");
+    expect(rerunning.stages[0]?.state).toBe("active");
+    expect(rerunning.stages[0]?.result).toBe("");
+    expect(rerunning.stages[1]?.state).toBe("pending");
   });
 });

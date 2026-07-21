@@ -7,6 +7,7 @@ import {
   createTaskInputSchema,
   markStageReadyForReview,
   pauseTask,
+  rerunStage,
   resumeTask,
   reviseStage,
   revisionInputSchema,
@@ -101,6 +102,15 @@ const registerIpcHandlers = (repository: TaskRepository): void => {
       return undefined;
     }
     currentTask = reviseStage(currentTask, input);
+    return persistCurrentTask(repository);
+  });
+
+  ipcMain.handle("doon:rerun-stage", (_event, payload: unknown) => {
+    const input = stageActionInputSchema.parse(payload);
+    if (currentTask === undefined) {
+      return undefined;
+    }
+    currentTask = rerunStage(currentTask, input);
     return persistCurrentTask(repository);
   });
 

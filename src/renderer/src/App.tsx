@@ -5,6 +5,7 @@ import {
   FileCheck,
   Pause,
   Play,
+  RefreshCcw,
   RotateCcw,
   Shield,
 } from "lucide-react";
@@ -55,6 +56,11 @@ export const App = () => {
     }
     setTask(await window.doon.reviseStage({ stageId, instruction: revision }));
     setRevision("");
+  };
+
+  const rerunStage = async (stageId: StageId) => {
+    setRevision("");
+    setTask(await window.doon.rerunStage({ stageId }));
   };
 
   const pauseTask = async () => setTask(await window.doon.pauseTask());
@@ -191,6 +197,15 @@ export const App = () => {
               >
                 <RotateCcw size={16} aria-hidden="true" />
                 수정 반영
+              </button>
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => rerunStage(activeStage.id)}
+                aria-label="현재 단계 재실행"
+                title="현재 단계 재실행"
+              >
+                <RefreshCcw size={16} aria-hidden="true" />
               </button>
             </div>
           </section>
