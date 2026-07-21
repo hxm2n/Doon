@@ -9,6 +9,7 @@
 - **Evidence reviewed:**
   - [`PRD-Doon.md`](./PRD-Doon.md)
   - User direction: Codex-like translucent desktop material with a soft, low-saturation yellow identity
+  - User direction: Glass morphism and liquid glass must be the default Doon style going forward
   - [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
   - [Raycast DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/raycast/DESIGN.md)
   - [Apple DESIGN.md](https://github.com/VoltAgent/awesome-design-md/blob/main/design-md/apple/DESIGN.md)
@@ -225,9 +226,11 @@ Partial success, changed interfaces, missing permissions, and interrupted work a
 
 ### Theme and atmosphere
 
-The visual direction is **Soft Amber Glass**: a quiet macOS utility built from cool neutral canvases, optically layered translucent material, precise edge refraction, and a soft butter-yellow action color. It should recall the calm dimensional material of Codex without copying its product chrome, layout, or branding.
+The visual direction is **Soft Amber Liquid Glass**: a quiet macOS utility built from cool neutral canvases, optically layered translucent material, liquid-like rim refraction, and a soft butter-yellow action color. It should recall the calm dimensional material of Codex and modern macOS glass without copying another product's chrome, layout, or branding.
 
 Glass is functional rather than decorative. Use it where seeing the active application behind Doon helps the user understand context: the Command Palette, Execution HUD, Checkpoint Review, transient dialogs, and compact navigation chrome. Main reading surfaces, long activity histories, settings forms, and document previews remain more opaque for legibility.
+
+Liquid glass is now the default expression for Doon's transient desktop surfaces. It means the pane feels like a thin optical object between the user and the active app: there is depth, edge brightness, soft internal refraction, and subtle movement-ready polish. It does not mean watery animation, glossy blobs, sci-fi glow, or high-contrast decoration. The material should feel tactile but still quiet enough to sit over someone else's work.
 
 Doon supports system light and dark appearance from the same semantic token model. Transparency must adapt to the wallpaper and underlying application without allowing either to reduce text contrast.
 
@@ -247,6 +250,10 @@ Use semantic names in code. Hex values are provisional until visual implementati
 | `glass-strong` | `rgba(255, 255, 255, 0.66)` | `rgba(31, 33, 38, 0.72)` | Readable glass without hiding the active application |
 | `glass-subtle` | `rgba(255, 255, 255, 0.34)` | `rgba(45, 47, 53, 0.42)` | Compact HUD and transient chrome |
 | `glass-warm` | `rgba(232, 207, 114, 0.16)` | `rgba(240, 217, 125, 0.12)` | Local amber refraction inside glass, never a flat fill |
+| `liquid-highlight` | `rgba(255, 255, 255, 0.68)` | `rgba(255, 255, 255, 0.18)` | Curved specular highlight across glass rims |
+| `liquid-shadow` | `rgba(42, 45, 52, 0.18)` | `rgba(0, 0, 0, 0.46)` | Contact and lower-edge density for thick glass |
+| `liquid-caustic` | `rgba(255, 238, 169, 0.22)` | `rgba(240, 217, 125, 0.10)` | Small warm refracted streaks inside glass |
+| `liquid-readability` | `rgba(255, 255, 255, 0.42)` | `rgba(18, 19, 22, 0.30)` | Local reading patch behind text on glass |
 | `border` | `rgba(69, 74, 82, 0.18)` | `rgba(255, 255, 255, 0.14)` | Standard boundaries |
 | `border-highlight` | `rgba(255, 255, 255, 0.86)` | `rgba(255, 255, 255, 0.24)` | Top-lit glass edge and inner refraction |
 | `border-shade` | `rgba(31, 34, 40, 0.20)` | `rgba(0, 0, 0, 0.42)` | Lower glass edge that gives the pane thickness |
@@ -291,6 +298,40 @@ Glass must read as layered material, not a transparent rectangle with blur appli
 - Every glass surface needs an opaque fallback using `surface` or `surface-elevated` when transparency is reduced, unsupported, or fails contrast.
 - Never stack glass panels inside other glass panels. Inner groups use dividers, opaque rows, or tonal surface changes.
 - Do not blur document previews, screenshots, or the content Doon is operating on.
+
+### Liquid glass layer system
+
+Use the liquid glass layer system for Command Palette, Onboarding, HUD, and Checkpoint Review. The system has five named parts; each implemented surface should map to these parts rather than inventing a one-off glass recipe.
+
+1. **Lens membrane:** the base panel blends `glass-strong`, `glass`, and `glass-warm` on a diagonal so the pane has temperature and not just opacity.
+2. **Optical rim:** a 1px border uses bright top/left and darker bottom/right values. Add an inset ring where the pane is important enough to feel thick.
+3. **Specular sheet:** a clipped pseudo-element sweeps across the top third with `liquid-highlight`; this sheet is wide and curved, not a discrete orb or blob.
+4. **Caustic streak:** a second clipped pseudo-element uses `liquid-caustic` as a narrow diagonal refraction band. It should be visible only when the user looks for it.
+5. **Reading patch:** text-heavy regions inside glass use `liquid-readability` as a localized backing layer. Do not make the whole pane opaque to solve contrast.
+
+Implementation rules:
+
+- Use semantic CSS variables for every liquid-glass color, shadow, blur, and transition.
+- Prefer pseudo-elements on shared primitives such as `.glass-panel`, `.stage-row`, and `.review-panel` over adding decorative DOM.
+- Pseudo-elements must be `pointer-events: none` and clipped by the parent radius.
+- The panel content must sit above material pseudo-elements with a local stacking context.
+- Liquid highlights may shift on hover or active state only when the element is interactive. Static panels should not animate by default.
+- Blur must be applied to bounded panels, not the full app shell or large scrolling containers.
+- Respect `prefers-reduced-transparency` and `prefers-reduced-motion`. Reduced transparency uses opaque `surface`; reduced motion removes transforms and highlight movement.
+- Avoid full-screen gradient orbs, bokeh, particles, and decorative blobs. Liquid glass uses sheets, rims, and refraction bands, not floating shapes.
+
+### Component material contract
+
+| Primitive | Required material behavior | Notes |
+| :--- | :--- | :--- |
+| `.glass-panel` | Liquid glass shell with lens membrane, rim, specular sheet, caustic streak, and deep but soft shadow | Used by command palette, onboarding, HUD |
+| `.primary-button` | Warm liquid action surface with subtle top highlight, inset rim, and press depth | Yellow should feel like enamel under glass, not a neon fill |
+| `.secondary-button` / `.ghost-button` | Thin translucent control with rim and mild hover refraction | Keep text actions limited; tertiary actions should stay quiet |
+| `.icon-button` | Compact circular lens button with visible focus ring and hover lift | Used for safety or utility actions |
+| `.stage-row` | Opaque-to-translucent row with a small lens marker; active state gets stronger rim and caustic warmth | Rows must remain scannable before decorative |
+| `.review-panel` | Strong glass frame with localized readable result text | This is the main judgment surface, so legibility wins |
+| `.command-input` / `.revision-input` | Inset glass field with opaque text backing and focus rim | Do not make typed text sit on a busy transparent field |
+| `.scope-row` | Onboarding scope row with subdued liquid lens treatment | Should look trustworthy, not like a marketing card |
 
 Surface mapping:
 
