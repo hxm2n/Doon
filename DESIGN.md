@@ -332,6 +332,7 @@ Implementation rules:
 | `.review-panel` | Strong glass frame with localized readable result text | This is the main judgment surface, so legibility wins |
 | `.command-input` / `.revision-input` | Inset glass field with opaque text backing and focus rim | Do not make typed text sit on a busy transparent field |
 | `.scope-row` | Onboarding scope row with subdued liquid lens treatment | Should look trustworthy, not like a marketing card |
+| `.permission-panel` / `.permission-row` | Onboarding permission status surface with compact readable rows and state labels | Required permissions are product safety information, so clarity wins over decoration |
 
 Surface mapping:
 

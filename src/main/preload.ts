@@ -1,6 +1,12 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { z } from "zod";
 import { type OnboardingStatus, onboardingStatusSchema } from "../shared/onboarding-model";
+import {
+  type OpenSystemPermissionSettingsInput,
+  openSystemPermissionSettingsInputSchema,
+  type SystemPermissionSnapshot,
+  systemPermissionSnapshotSchema,
+} from "../shared/permission-model";
 import type {
   CreateTaskInput,
   RevisionInput,
@@ -19,6 +25,10 @@ export type DoonApi = {
   readonly getOnboardingStatus: () => Promise<OnboardingStatus>;
   readonly completeOnboarding: () => Promise<OnboardingStatus>;
   readonly resetOnboarding: () => Promise<OnboardingStatus>;
+  readonly getSystemPermissionSnapshot: () => Promise<SystemPermissionSnapshot>;
+  readonly openSystemPermissionSettings: (
+    input: OpenSystemPermissionSettingsInput,
+  ) => Promise<void>;
   readonly getCurrentTask: () => Promise<TaskSnapshot | undefined>;
   readonly createTask: (input: CreateTaskInput) => Promise<TaskSnapshot | undefined>;
   readonly startStage: (input: StageActionInput) => Promise<TaskSnapshot | undefined>;
@@ -54,6 +64,16 @@ const doonApi: DoonApi = {
     onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:complete-onboarding")),
   resetOnboarding: async () =>
     onboardingStatusSchema.parse(await ipcRenderer.invoke("doon:reset-onboarding")),
+  getSystemPermissionSnapshot: async () =>
+    systemPermissionSnapshotSchema.parse(
+      await ipcRenderer.invoke("doon:get-system-permission-snapshot"),
+    ),
+  openSystemPermissionSettings: async (input) => {
+    await ipcRenderer.invoke(
+      "doon:open-system-permission-settings",
+      openSystemPermissionSettingsInputSchema.parse(input),
+    );
+  },
   getCurrentTask: () => invokeTask("doon:get-current-task"),
   createTask: (input) => invokeTask("doon:create-task", input),
   startStage: (input) => invokeTask("doon:start-stage", input),

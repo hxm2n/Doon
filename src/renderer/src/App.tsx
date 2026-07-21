@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { OnboardingStatus } from "../../shared/onboarding-model";
+import type { SystemPermissionId, SystemPermissionSnapshot } from "../../shared/permission-model";
 import { type StageId, stageDefinitions, type TaskSnapshot } from "../../shared/task-model";
 import { OnboardingPanel } from "./OnboardingPanel";
 
@@ -19,19 +20,25 @@ const defaultCommand =
 export const App = () => {
   const [command, setCommand] = useState(defaultCommand);
   const [onboardingStatus, setOnboardingStatus] = useState<OnboardingStatus | undefined>(undefined);
+  const [permissionSnapshot, setPermissionSnapshot] = useState<
+    SystemPermissionSnapshot | undefined
+  >(undefined);
   const [revision, setRevision] = useState("");
   const [task, setTask] = useState<TaskSnapshot | undefined>(undefined);
 
   useEffect(() => {
     let isMounted = true;
-    Promise.all([window.doon.getOnboardingStatus(), window.doon.getCurrentTask()]).then(
-      ([savedOnboardingStatus, savedTask]) => {
-        if (isMounted) {
-          setOnboardingStatus(savedOnboardingStatus);
-          setTask(savedTask);
-        }
-      },
-    );
+    Promise.all([
+      window.doon.getOnboardingStatus(),
+      window.doon.getSystemPermissionSnapshot(),
+      window.doon.getCurrentTask(),
+    ]).then(([savedOnboardingStatus, savedPermissionSnapshot, savedTask]) => {
+      if (isMounted) {
+        setOnboardingStatus(savedOnboardingStatus);
+        setPermissionSnapshot(savedPermissionSnapshot);
+        setTask(savedTask);
+      }
+    });
 
     return () => {
       isMounted = false;
@@ -47,6 +54,15 @@ export const App = () => {
     setOnboardingStatus(nextOnboardingStatus);
   };
 
+  const refreshPermissions = async () => {
+    setPermissionSnapshot(await window.doon.getSystemPermissionSnapshot());
+  };
+
+  const openPermissionSettings = async (permissionId: SystemPermissionId) => {
+    await window.doon.openSystemPermissionSettings({ permissionId });
+    await refreshPermissions();
+  };
+
   if (onboardingStatus === undefined) {
     return (
       <main className="onboarding-shell">
@@ -59,7 +75,14 @@ export const App = () => {
   }
 
   if (!onboardingStatus.scopeConfirmed) {
-    return <OnboardingPanel onConfirm={completeOnboarding} />;
+    return (
+      <OnboardingPanel
+        onConfirm={completeOnboarding}
+        permissionSnapshot={permissionSnapshot}
+        onOpenPermissionSettings={openPermissionSettings}
+        onRefreshPermissions={refreshPermissions}
+      />
+    );
   }
 
   const createTask = async () => {
